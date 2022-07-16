@@ -25,6 +25,7 @@ window.onload = () => {
       if (/\D/.test(inputRating.value)) {
         inputRating.value = inputRating.value.replace(/\D/, "");
       }
+
       chrome.storage.local.set({ minimalRating: inputRating.value });
     });
   })();
