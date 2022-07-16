@@ -11,8 +11,14 @@
       "run_at": "document_end"
     }
   ],
+  "icons": {
+    "16": "taobao.png",
+    "48": "taobao.png",
+    "128": "taobao.png"
+  },
   "permissions": ["tabs", "storage"],
-  "browser_action": {
-    "default_title": "Taobao extension"
+  "action": {
+    "default_title": "Taobao extension",
+    "default_popup": "popup.html"
   }
 }
