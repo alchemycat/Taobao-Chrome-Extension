@@ -1,19 +1,36 @@
 window.onload = () => {
   const mrg = 480;
 
-  const item = document.querySelector('[data-category="auctions"]');
-  const itemNid = item.querySelector("a[trace-nid]").getAttribute("trace-nid");
-
   window.addEventListener("message", (event) => {
     if (event.data.type == "FROM_PAGE") {
       let data = event.data.formatted;
-      const searchIndex = data.findIndex((object) => object.nid == itemNid);
+      const auctionsItem = document.querySelectorAll(
+        '[data-category="auctions"]'
+      );
 
-      if (searchIndex == -1) {
-        console.log(`Такого элемента нету в массиве с данными`);
-      }
+      auctionsItem.forEach((auction) => {
+        const nid = auction
+          .querySelector("a[trace-nid]")
+          .getAttribute("trace-nid");
 
-      const targetItem = data[searchIndex].shopcard;
+        const auctionIndex = data.findIndex((obj) => obj.nid == nid);
+        if (auctionIndex == -1) {
+          console.log(`Такого элемента нету в массиве с данными`);
+        }
+        const shopcard = data[auctionIndex].shopcard;
+
+        const result = filter(shopcard, mrg, [
+          "delivery",
+          "description",
+          "service",
+        ]);
+
+        if (!result) {
+          console.log("Скрываю элемент");
+          auction.style.display = "none";
+          console.log(auction);
+        }
+      });
 
       function filter(target, mrg, keys) {
         let success = 0;
@@ -28,17 +45,6 @@ window.onload = () => {
           return true;
         }
         return false;
-      }
-
-      const result = filter(targetItem, mrg, [
-        "delivery",
-        "description",
-        "service",
-      ]);
-
-      if (!result) {
-        console.log("Скрываю элемент");
-        item.style.display = "none";
       }
     }
   });
