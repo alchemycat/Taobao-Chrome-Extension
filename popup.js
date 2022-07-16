@@ -15,18 +15,40 @@ window.onload = () => {
       });
     }
 
-    const inputRating = document.getElementById("mrg");
+    const inputRating = document.getElementById("mrg"),
+      whitelist = document.getElementById("whitelist"),
+      whitelistCheckbox = document.getElementById("whitelist_checkbox");
 
     let minimalRating = await getData("minimalRating");
     if (minimalRating) {
       inputRating.value = minimalRating;
     }
+
+    let isChecked = await getData("whitelistChecked");
+
+    if (isChecked) {
+      whitelistCheckbox.checked = isChecked;
+    }
+
+    let whitelistValue = await getData("whitelist");
+    if (whitelistValue) {
+      whitelist.value = whitelistValue;
+    }
+
     inputRating.addEventListener("input", () => {
       if (/\D/.test(inputRating.value)) {
         inputRating.value = inputRating.value.replace(/\D/, "");
       }
 
       chrome.storage.local.set({ minimalRating: inputRating.value });
+    });
+
+    whitelistCheckbox.addEventListener("change", () => {
+      chrome.storage.local.set({ whitelistChecked: whitelistCheckbox.checked });
+    });
+
+    whitelist.addEventListener("input", () => {
+      chrome.storage.local.set({ whitelist: whitelist.value });
     });
   })();
 };
