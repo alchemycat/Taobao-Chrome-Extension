@@ -30,6 +30,7 @@ window.onload = () => {
     window.addEventListener("message", (event) => {
       if (event.data.type == "FROM_PAGE") {
         data = event.data.formatted;
+        console.log(data);
 
         chrome.storage.local.set({ data });
 
@@ -76,6 +77,7 @@ window.onload = () => {
           console.log(`Такого елементу немає у массиві`);
         }
         const shopcard = data[auctionIndex].shopcard;
+        const userId = data[auctionIndex].userId;
 
         const result = filter(shopcard, mrg, [
           "delivery",
