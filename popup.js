@@ -56,9 +56,9 @@ window.onload = () => {
 
     whitelist.addEventListener("input", () => {
       if (/\ /.test(whitelist.value)) {
-        console.log("replace");
         whitelist.value = whitelist.value.replace(/\ /, "\n");
       }
+      console.log(whitelist.value.split("\n"));
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
   })();
