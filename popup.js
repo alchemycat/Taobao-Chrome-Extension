@@ -28,6 +28,8 @@ window.onload = () => {
 
     if (isChecked) {
       whitelistCheckbox.checked = isChecked;
+    } else {
+      whitelist.setAttribute("disabled", true);
     }
 
     let whitelistValue = await getData("whitelist");
@@ -44,10 +46,19 @@ window.onload = () => {
     });
 
     whitelistCheckbox.addEventListener("change", () => {
+      if (!whitelistCheckbox.checked) {
+        whitelist.setAttribute("disabled", true);
+      } else {
+        whitelist.removeAttribute("disabled");
+      }
       chrome.storage.local.set({ whitelistChecked: whitelistCheckbox.checked });
     });
 
     whitelist.addEventListener("input", () => {
+      if (/\ /.test(whitelist.value)) {
+        console.log("replace");
+        whitelist.value = whitelist.value.replace(/\ /, "\n");
+      }
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
   })();
