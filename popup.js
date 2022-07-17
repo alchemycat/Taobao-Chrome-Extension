@@ -58,7 +58,6 @@ window.onload = () => {
       if (/\ /.test(whitelist.value)) {
         whitelist.value = whitelist.value.replace(/\ /, "\n");
       }
-      console.log(whitelist.value.split("\n"));
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
   })();

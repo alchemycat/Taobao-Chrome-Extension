@@ -12,21 +12,18 @@ window.onload = () => {
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
       if (changes) {
-        // console.log(`Changes: ${JSON.stringify(changes)}`);
-        try {
-          if (changes.minimalRating.newValue) {
-            mrg = parseInt(changes.minimalRating.newValue);
-          }
-          if (changes.whitelist.newValue) {
-            whitelist = changes.whitelist.newValue;
-          }
-          if (changes.whitelistChecked.newValue) {
-            isChecked = changes.whitelistChecked.newValue;
-          }
-          if (isNaN(mrg)) {
-            mrg = 0;
-          }
-        } catch {}
+        if (changes.minimalRating) {
+          mrg = parseInt(changes.minimalRating.newValue);
+        }
+        if (changes.whitelist) {
+          whitelist = changes.whitelist.newValue;
+        }
+        if (changes.whitelistChecked) {
+          isChecked = changes.whitelistChecked.newValue;
+        }
+        if (isNaN(mrg)) {
+          mrg = 0;
+        }
         changeVisibility(data, whitelist);
       }
     });
@@ -113,24 +110,22 @@ window.onload = () => {
           }
         });
 
-        if (isExist) {
-          //Якщо елемент знайдений в whitelist тоді не ховаємо його
-          return true;
+        if (!isExist) {
+          return false;
         }
       }
 
-      // if (!isExist) {
-      //   keys.forEach((item) => {
-      //     if (target.shopcard[item] && target.shopcard[item][0] > mrg) {
-      //       success += 1;
-      //     }
-      //   });
-      // }
+      keys.forEach((item) => {
+        if (target.shopcard[item] && target.shopcard[item][0] > mrg) {
+          success += 1;
+        }
+      });
 
-      // if (success === 3) {
-      //   return true;
-      // }
-      return false;
+      if (success === 3) {
+        return true;
+      } else {
+        return false;
+      }
     }
   })();
 
