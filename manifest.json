@@ -22,7 +22,6 @@
   "permissions": ["tabs", "storage", "webRequest"],
   "host_permissions": ["https://s.taobao.com/"],
   "action": {
-    "default_title": "Taobao extension",
-    "default_popup": "popup.html"
+    "default_title": "Taobao"
   }
 }
