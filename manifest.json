@@ -11,12 +11,22 @@
       "run_at": "document_end"
     }
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "icons": {
     "16": "taobao.png",
     "48": "taobao.png",
     "128": "taobao.png"
   },
-  "permissions": ["tabs", "storage"],
+  "permissions": ["tabs", "storage", "webRequest", "scripting"],
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js"],
+      "matches": ["https://s.taobao.com/*"]
+    }
+  ],
+  "host_permissions": ["https://s.taobao.com/"],
   "action": {
     "default_title": "Taobao extension",
     "default_popup": "popup.html"

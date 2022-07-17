@@ -13,8 +13,10 @@ window.onload = () => {
     var observer = new MutationObserver(async function (mutations) {
       if (location.href !== previousUrl) {
         previousUrl = location.href;
-        getConfig();
-        changeVisibility(data, whitelist);
+        // console.log("getConfig on");
+        // console.log(location.href);
+        fetchData(location.href);
+        // getConfig();
       }
     });
 
@@ -46,6 +48,8 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       if (event.data.type == "FROM_PAGE") {
         data = event.data.formatted;
+        // console.log(`Get data`);
+        console.log(data);
         chrome.storage.local.set({ data });
         changeVisibility(data, whitelist);
       }
@@ -54,26 +58,26 @@ window.onload = () => {
 
     //знаходимо об'єкт g_page_config у скриптах на сторінці, парсимо його в об'єкт та передаємо в іншу функцію
 
-    function getConfig() {
-      const scripts = document.querySelectorAll("script");
+    // function getConfig() {
+    //   const scripts = document.querySelectorAll("script");
 
-      scripts.forEach((item) => {
-        if (/g_page_config/.test(item.textContent)) {
-          const g_page_config = item.textContent
-            .replace("g_page_config = ", "")
-            .trim()
-            .split("}};");
+    //   scripts.forEach((item) => {
+    //     if (/g_page_config/.test(item.textContent)) {
+    //       const g_page_config = item.textContent
+    //         .replace("g_page_config = ", "")
+    //         .trim()
+    //         .split("}};");
 
-          const f = JSON.parse(g_page_config[0] + "}}");
+    //       const f = JSON.parse(g_page_config[0] + "}}");
 
-          var data = {
-            type: "FROM_PAGE",
-            formatted: f.mods.itemlist.data.auctions,
-          };
-          window.postMessage(data, "*");
-        }
-      });
-    }
+    //       var data = {
+    //         type: "FROM_PAGE",
+    //         formatted: f.mods.itemlist.data.auctions,
+    //       };
+    //       window.postMessage(data, "*");
+    //     }
+    //   });
+    // }
 
     //--------------------------
 
@@ -95,8 +99,10 @@ window.onload = () => {
           .getAttribute("trace-nid");
 
         const auctionIndex = data.findIndex((obj) => obj.nid == nid);
+
         if (auctionIndex == -1) {
           console.log(`Такого елементу немає у массиві`);
+          return;
         }
 
         const target = data[auctionIndex];
@@ -108,9 +114,8 @@ window.onload = () => {
           wl
         );
 
-        console.log(`Result: ${result}`);
         if (!result) {
-          console.log("Додав display: none для елемента");
+          // console.log("Додав display: none для елемента");
           auction.style.display = "none";
         }
       });
@@ -149,6 +154,59 @@ window.onload = () => {
     }
     //--------------------------
   })();
+
+  // Функція яка забирає json з потрібними даними
+  function fetchData(url) {
+    fetch(url)
+      .then((response) => response.body)
+      .then((rb) => {
+        const reader = rb.getReader();
+
+        return new ReadableStream({
+          start(controller) {
+            // The following function handles each data chunk
+            function push() {
+              // "done" is a Boolean and value a "Uint8Array"
+              reader.read().then(({ done, value }) => {
+                // If there is no more data to read
+                if (done) {
+                  // console.log("done", done);
+                  controller.close();
+                  return;
+                }
+                // Get the data and send it to the browser via the controller
+                controller.enqueue(value);
+                // Check chunks by logging to the console
+                // console.log(done, value);
+                push();
+              });
+            }
+
+            push();
+          },
+        });
+      })
+      .then((stream) => {
+        // Respond with our stream
+        return new Response(stream, {
+          headers: { "Content-Type": "text/html" },
+        }).text();
+      })
+      .then((result) => {
+        // Do things with result
+        let json = result
+          .match(/(?<=g_page_config\ =).*}};/)[0]
+          .trim()
+          .replace("}};", "}}");
+        var data = {
+          type: "FROM_PAGE",
+          formatted: JSON.parse(json).mods.itemlist.data.auctions,
+        };
+        window.postMessage(data, "*");
+      });
+  }
+
+  //--------------------------
 
   //Функція яка отримує дані зі storage
   function getData(sKey) {
