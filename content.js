@@ -5,9 +5,22 @@ window.onload = () => {
     let isChecked = await getData("whitelistChecked");
     let whitelist = await getData("whitelist");
     let data;
-    console.log(
-      `Rating: ${mrg}\nisChecked: ${isChecked}\nwhitelist: ${whitelist}`
-    );
+    //--------------------------
+
+    //Обсервер який слідкує за змінами на сторінці
+    var previousUrl = "";
+
+    var observer = new MutationObserver(async function (mutations) {
+      if (location.href !== previousUrl) {
+        previousUrl = location.href;
+        getConfig();
+        changeVisibility(data, whitelist);
+      }
+    });
+
+    const config = { subtree: true, childList: true };
+    observer.observe(document, config);
+    //--------------------------
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
@@ -40,26 +53,31 @@ window.onload = () => {
     //--------------------------
 
     //знаходимо об'єкт g_page_config у скриптах на сторінці, парсимо його в об'єкт та передаємо в іншу функцію
-    const scripts = document.querySelectorAll("script");
 
-    scripts.forEach((item) => {
-      if (/g_page_config/.test(item.textContent)) {
-        const g_page_config = item.textContent
-          .replace("g_page_config = ", "")
-          .trim()
-          .split("}};");
+    function getConfig() {
+      const scripts = document.querySelectorAll("script");
 
-        const f = JSON.parse(g_page_config[0] + "}}");
+      scripts.forEach((item) => {
+        if (/g_page_config/.test(item.textContent)) {
+          const g_page_config = item.textContent
+            .replace("g_page_config = ", "")
+            .trim()
+            .split("}};");
 
-        var data = {
-          type: "FROM_PAGE",
-          formatted: f.mods.itemlist.data.auctions,
-        };
-        window.postMessage(data, "*");
-      }
-    });
+          const f = JSON.parse(g_page_config[0] + "}}");
+
+          var data = {
+            type: "FROM_PAGE",
+            formatted: f.mods.itemlist.data.auctions,
+          };
+          window.postMessage(data, "*");
+        }
+      });
+    }
+
     //--------------------------
 
+    //Функція яка ховає та показує елементи
     function changeVisibility(data, whitelist) {
       const auctionsItem = document.querySelectorAll(
         '[data-category="auctions"]'
@@ -97,7 +115,9 @@ window.onload = () => {
         }
       });
     }
+    //--------------------------
 
+    //Функція на основі якої приймається рішення чи ховати елемент
     function filter(target, mrg, keys, list) {
       let success = 0;
       let isExist = false;
@@ -127,8 +147,10 @@ window.onload = () => {
         return false;
       }
     }
+    //--------------------------
   })();
 
+  //Функція яка отримує дані зі storage
   function getData(sKey) {
     return new Promise(function (resolve, reject) {
       chrome.storage.local.get(sKey, function (items) {
@@ -141,4 +163,5 @@ window.onload = () => {
       });
     });
   }
+  //--------------------------
 };
