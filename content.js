@@ -2,25 +2,31 @@ window.onload = () => {
   (async () => {
     //Отримуємо дані які зараз в storage
     let mrg = await getData("minimalRating");
-    let isChecked = await getData("whitelistCheckbox");
+    let isChecked = await getData("whitelistChecked");
     let whitelist = await getData("whitelist");
     let data;
+    console.log(
+      `Rating: ${mrg}\nisChecked: ${isChecked}\nwhitelist: ${whitelist}`
+    );
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
       if (changes) {
-        if (changes.minimalRating.newValue) {
-          mrg = parseInt(changes.minimalRating.newValue);
-        }
-        if (changes.whitelist.newValue) {
-          whitelist = changes.whitelist.newValue;
-        }
-        if (changes.whitelistCheckbox.newValue) {
-          isChecked = changes.whitelistCheckbox.newValue;
-        }
-        if (isNaN(mrg)) {
-          mrg = 0;
-        }
+        // console.log(`Changes: ${JSON.stringify(changes)}`);
+        try {
+          if (changes.minimalRating.newValue) {
+            mrg = parseInt(changes.minimalRating.newValue);
+          }
+          if (changes.whitelist.newValue) {
+            whitelist = changes.whitelist.newValue;
+          }
+          if (changes.whitelistChecked.newValue) {
+            isChecked = changes.whitelistChecked.newValue;
+          }
+          if (isNaN(mrg)) {
+            mrg = 0;
+          }
+        } catch {}
         changeVisibility(data, whitelist);
       }
     });
@@ -30,10 +36,8 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       if (event.data.type == "FROM_PAGE") {
         data = event.data.formatted;
-        console.log(data);
         chrome.storage.local.set({ data });
-        const wl = await getData("whitelist");
-        changeVisibility(data, wl);
+        changeVisibility(data, whitelist);
       }
     });
     //--------------------------
@@ -89,11 +93,44 @@ window.onload = () => {
           wl
         );
 
+        console.log(`Result: ${result}`);
         if (!result) {
           console.log("Додав display: none для елемента");
           auction.style.display = "none";
         }
       });
+    }
+
+    function filter(target, mrg, keys, list) {
+      let success = 0;
+      let isExist = false;
+
+      //Перевіряємо чи whitelist використовується
+      if (isChecked) {
+        list.forEach((item) => {
+          if (target["user_id"] == item) {
+            isExist = true;
+          }
+        });
+
+        if (isExist) {
+          //Якщо елемент знайдений в whitelist тоді не ховаємо його
+          return true;
+        }
+      }
+
+      // if (!isExist) {
+      //   keys.forEach((item) => {
+      //     if (target.shopcard[item] && target.shopcard[item][0] > mrg) {
+      //       success += 1;
+      //     }
+      //   });
+      // }
+
+      // if (success === 3) {
+      //   return true;
+      // }
+      return false;
     }
   })();
 
@@ -108,35 +145,5 @@ window.onload = () => {
         }
       });
     });
-  }
-
-  async function filter(target, mrg, keys, list) {
-    const isChecked = await getData("whitelistCheckbox");
-    let success = 0;
-    let isExist = false;
-
-    if (isChecked) {
-      list.forEach((item) => {
-        if (target["user_id"] == item) {
-          isExist = true;
-        }
-      });
-      if (isExist) {
-        return true;
-      }
-    }
-
-    // if (!isExist) {
-    //   keys.forEach((item) => {
-    //     if (target.shopcard[item] && target.shopcard[item][0] > mrg) {
-    //       success += 1;
-    //     }
-    //   });
-    // }
-
-    // if (success === 3) {
-    //   return true;
-    // }
-    return false;
   }
 };
