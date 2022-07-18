@@ -59,19 +59,35 @@ window.onload = () => {
       let json = [];
 
       data.forEach((item, i) => {
-        let newJson = {};
+        try {
+          let newJson = {};
 
-        newJson.itemID = item.nid;
-        newJson.shopID = item.user_id;
-        newJson.longTitle = item.raw_title;
-        newJson.shortTitle = item.raw_title.match(/\w+/g).join(" | ");
-        newJson.volumeOfSales = item.view_sales;
-        newJson.picUrl = item.pic_url;
-        newJson.delivery = item.shopcard.delivery[0] || false;
-        newJson.description = item.shopcard.description[0] || false;
-        newJson.service = item.shopcard.service[0] || false;
+          let formattedTitle = item.raw_title.match(/\w+/g);
 
-        json.push(newJson);
+          if (Array.isArray(formattedTitle)) {
+            if (formattedTitle.length > 1) {
+              formattedTitle = formattedTitle.join(" | ");
+            } else if (formattedTitle.length == 1) {
+              formattedTitle = formattedTitle[0];
+            }
+          } else {
+            formattedTitle = false;
+          }
+
+          newJson.itemID = item.nid;
+          newJson.shopID = item.user_id;
+          newJson.longTitle = item.raw_title;
+          newJson.shortTitle = formattedTitle;
+          newJson.volumeOfSales = item.view_sales;
+          newJson.picUrl = item.pic_url;
+          newJson.delivery = item.shopcard.delivery[0] || false;
+          newJson.description = item.shopcard.description[0] || false;
+          newJson.service = item.shopcard.service[0] || false;
+
+          json.push(newJson);
+        } catch (err) {
+          console.log(err);
+        }
       });
 
       console.log(json);
