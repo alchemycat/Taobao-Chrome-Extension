@@ -77,7 +77,7 @@ window.onload = () => {
               formattedTitle = formattedTitle[0];
             }
           } else {
-            formattedTitle = false;
+            formattedTitle = `Keyword ${item.raw_title}`;
           }
           newJson.index = i + 1;
           newJson.itemID = item.nid;
@@ -131,13 +131,18 @@ window.onload = () => {
             `div[data-index="${item.index - 1}"]`
           );
           if (elem) {
-            console.log(`Елемент знайдено index: ${item.index - 1}`);
+            // console.log(`Елемент знайдено index: ${item.index - 1}`);
             elem.style.display = "none"; //ховаємо елемент
-            console.log(`Ховаю елемент: ${JSON.stringify(item)}`);
-          } else {
-            console.log(`Елемент не знайдено ${JSON.stringify(item)}`);
+            // console.log(`Ховаю елемент: ${JSON.stringify(item)}`);
           }
+          //  else {
+          // console.log(`Елемент не знайдено ${JSON.stringify(item)}`);
+          // }
         }
+      });
+
+      json.forEach((item) => {
+        console.log(`Результат: ${JSON.stringify(item)}`);
       });
     }
     //--------------------------

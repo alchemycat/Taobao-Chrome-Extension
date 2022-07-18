@@ -19,6 +19,12 @@
     "48": "taobao.png",
     "128": "taobao.png"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["content.js"],
+      "matches": ["https://s.taobao.com/*"]
+    }
+  ],
   "permissions": ["tabs", "storage", "webRequest"],
   "host_permissions": ["https://s.taobao.com/"],
   "action": {
