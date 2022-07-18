@@ -112,6 +112,19 @@ window.onload = () => {
         }
       });
 
+      if (isChecked) {
+        let wl = whitelist.split("\n");
+
+        json = json.map((item) => {
+          if (item.filter) {
+            if (!wl.includes(item.shopID)) {
+              item.filter = false;
+            }
+          }
+          return item;
+        });
+      }
+
       json.forEach((item) => {
         if (!item.filter) {
           const elem = document.querySelector(
