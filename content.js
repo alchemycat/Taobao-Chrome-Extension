@@ -50,6 +50,8 @@ window.onload = () => {
         data = event.data.formatted;
         chrome.storage.local.set({ data });
         changeVisibility(data, whitelist);
+      } else {
+        console.log(event);
       }
     });
     //--------------------------
@@ -60,88 +62,31 @@ window.onload = () => {
         '[data-category="auctions"]'
       ); //шукаємо всі елементи auctions
 
-      let wl;
-
-      if (whitelist) {
-        wl = whitelist.split("\n"); //перетворюємо дані з whitelist у массив
-      }
-
-      //Додаємо кожному елементу display: block;
-      auctionsItem.forEach((auction) => {
-        auction.style.display = "block";
+      auctionsItem.forEach((item) => {
+        item.style.display = "none";
       });
 
-      //Тут вже працюємо з кожним елементом окремо
-      auctionsItem.forEach((auction) => {
-        const nid = auction
-          .querySelector("a[trace-nid]")
-          .getAttribute("trace-nid"); //отримуємо nid елемента
+      let filteredData;
 
-        const auctionIndex = data.findIndex((obj) => obj.nid == nid); //перевіряємо чи є в масиві з отриманими даними такий елемент
+      filteredData = data.filter(
+        (item) =>
+          item.shopcard["delivery"][0] >= mrg &&
+          item.shopcard["description"][0] >= mrg &&
+          item.shopcard["service"][0] >= mrg
+      );
 
-        if (auctionIndex == -1) {
-          console.log(
-            `Nid: ${nid} немає у массиві з даними: ${JSON.stringify(data)}`
-          );
-          return; //якщо елементу немає тоді йдемо далі
-        }
-
-        const target = data[auctionIndex]; //якщо елемент є тоді достаємо всі дані з массиву data по його індексу
-
-        const result = filter(
-          target,
-          mrg,
-          ["delivery", "description", "service"],
-          wl
-        ); //Виконуємо функцію filter на основі якої і будем ховати або показувати елемент
-
-        if (!result) {
-          auction.style.display = "none"; //додаємо display: none; якщо елемент не підходить
-          console.log(`NID: ${target.nid} Ховаю елемент`);
-        }
-      });
-    }
-    //--------------------------
-
-    //Функція на основі якої приймається рішення чи ховати елемент
-    function filter(target, mrg, keys, list) {
-      let success = 0;
-      let isExist = false;
-
-      //Перевіряємо чи whitelist використовується, а також чи є в ньому дані
-      if (isChecked && list) {
-        //проходимо по кожному елементу з whitelist та зрівнюємо з user_id нашого елементу
-        list.forEach((item) => {
-          if (target["user_id"] == item) {
-            isExist = true; //додаємо значення яке говорить про те що такий елемент знайшовся і потрібно його показувати на сторінці
-          }
-        });
-
-        if (!isExist) {
-          return false; //якщо потрібних елементів не знайдено тоді просто повертаємо false і ховаємо елемент
-        }
+      if (isChecked) {
+        let wl = whitelist.split("\n"); //перетворюємо дані з whitelist у массив
+        filteredData = filteredData.filter((item) => !wl.includes(item.nid));
       }
 
-      //keys = ["delivery", "description", "service"]
-      keys.forEach((item) => {
-        //Перевіряємо чи наш елемент має в собі delivery,description,service а також одразу і перевіряємо рейтинг
-        if (
-          target.shopcard &&
-          target.shopcard[item] &&
-          Array.isArray(target.shopcard[item]) &&
-          target.shopcard[item][0] >= mrg
-        ) {
-          success += 1; //якщо правило проходить тоді дописуємов +1 до успішних ітерацій
+      filteredData.forEach((item) => {
+        let elem = document.querySelector(`a[trace-nid="${item.nid}"]`);
+        if (elem) {
+          elem.parentElement.parentElement.parentElement.parentElement.style.display =
+            "block";
         }
       });
-
-      if (success === 3) {
-        //якщо було 3 успішні ітерації це значить що елемент пройшов тест і його потрібно показати тому повертаємо true
-        return true;
-      } else {
-        //повертаємо false елемент не пройшов тест
-        return false;
-      }
     }
     //--------------------------
   })();
