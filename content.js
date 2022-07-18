@@ -58,6 +58,12 @@ window.onload = () => {
     function changeVisibility(data, whitelist) {
       let json = [];
 
+      document
+        .querySelectorAll('[data-category="auctions"]')
+        .forEach((item) => {
+          item.style.display = "block";
+        }); // спочатку надаємо всім елементам display: block;
+
       data.forEach((item, i) => {
         try {
           let newJson = {};
@@ -73,16 +79,19 @@ window.onload = () => {
           } else {
             formattedTitle = false;
           }
-
+          newJson.index = i + 1;
           newJson.itemID = item.nid;
           newJson.shopID = item.user_id;
           newJson.longTitle = item.raw_title;
           newJson.shortTitle = formattedTitle;
           newJson.volumeOfSales = item.view_sales;
           newJson.picUrl = item.pic_url;
-          newJson.delivery = item.shopcard.delivery[0] || false;
-          newJson.description = item.shopcard.description[0] || false;
-          newJson.service = item.shopcard.service[0] || false;
+          newJson.delivery = item.shopcard.delivery[0] || 0;
+          newJson.description = item.shopcard.description[0] || 0;
+          newJson.service = item.shopcard.service[0] || 0;
+          newJson.filter = true;
+          newJson.toSave = false;
+          newJson.idNote = "";
 
           json.push(newJson);
         } catch (err) {
@@ -90,40 +99,33 @@ window.onload = () => {
         }
       });
 
-      console.log(json);
-      // //--------------------------
-      // const auctionsItem = document.querySelectorAll(
-      //   '[data-category="auctions"]'
-      // ); //шукаємо всі елементи auctions
+      json = json.map((item, i) => {
+        if (
+          item.delivery < mrg &&
+          item.description < mrg &&
+          item.service < mrg
+        ) {
+          item.filter = false;
+          return item;
+        } else {
+          return item;
+        }
+      });
 
-      // auctionsItem.forEach((item) => {
-      //   item.style.display = "none";
-      // });
-
-      // let filteredData;
-
-      // filteredData = data.filter((item) => {
-      //   if (
-      //     item.shopcard["delivery"][0] >= mrg &&
-      //     item.shopcard["description"][0] >= mrg &&
-      //     item.shopcard["service"][0] >= mrg
-      //   ) {
-      //     return item;
-      //   }
-      // });
-
-      // if (isChecked) {
-      //   let wl = whitelist.split("\n"); //перетворюємо дані з whitelist у массив
-      //   filteredData = filteredData.filter((item) => wl.includes(item.user_id));
-      // }
-
-      // filteredData.forEach((item) => {
-      //   auctionsItem.forEach((auction) => {
-      //     if (auction.querySelector(`a[trace-nid="${item.nid}"]`)) {
-      //       auction.style.display = "block";
-      //     }
-      //   });
-      // });
+      json.forEach((item) => {
+        if (!item.filter) {
+          const elem = document.querySelector(
+            `div[data-index="${item.index - 1}"]`
+          );
+          if (elem) {
+            console.log(`Елемент знайдено index: ${item.index - 1}`);
+            elem.style.display = "none"; //ховаємо елемент
+            console.log(`Ховаю елемент: ${JSON.stringify(item)}`);
+          } else {
+            console.log(`Елемент не знайдено ${JSON.stringify(item)}`);
+          }
+        }
+      });
     }
     //--------------------------
   })();
