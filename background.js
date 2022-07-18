@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.action.onClicked.addListener(function (tab) {
   console.log("icon clicked");
   chrome.tabs.create({
-    url: "options.html",
+    url: "options/options.html",
   });
 });
 

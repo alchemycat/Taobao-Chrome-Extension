@@ -1,5 +1,12 @@
 window.onload = () => {
   (async () => {
+    //
+    let css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = chrome.runtime.getURL("assets/sprite/sprite.css");
+    document.querySelector("head").append(css);
+    //--------------------------
+
     //Отримуємо дані які зараз в storage
     let mrg = parseInt(await getStorageData("minimalRating"));
     let isChecked = await getStorageData("whitelistChecked");
@@ -138,11 +145,27 @@ window.onload = () => {
           //  else {
           // console.log(`Елемент не знайдено ${JSON.stringify(item)}`);
           // }
+        } else {
+          const elem = document.querySelector(
+            `div[data-index="${item.index - 1}"]`
+          );
+          if (elem) {
+            const isExist = elem.querySelector(".sprite");
+            if (!isExist) {
+              let sprite = document.createElement("div");
+              sprite.classList.add("sprite");
+              sprite.classList.add("icon-plus");
+              sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
+                "assets/sprite/sprite.png"
+              )})`;
+              elem.style.position = "relative";
+              sprite.style.position = "absolute";
+              sprite.style.bottom = "10px";
+              sprite.style.right = "35px";
+              elem.append(sprite);
+            }
+          }
         }
-      });
-
-      json.forEach((item) => {
-        console.log(`Результат: ${JSON.stringify(item)}`);
       });
     }
     //--------------------------

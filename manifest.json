@@ -21,12 +21,16 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["content.js"],
+      "resources": [
+        "content.js",
+        "assets/sprite/sprite.png",
+        "assets/sprite/sprite.css"
+      ],
       "matches": ["https://s.taobao.com/*"]
     }
   ],
   "permissions": ["tabs", "storage", "webRequest"],
-  "host_permissions": ["https://s.taobao.com/"],
+  "host_permissions": ["https://s.taobao.com/*"],
   "action": {
     "default_title": "Taobao"
   }
