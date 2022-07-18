@@ -138,13 +138,8 @@ window.onload = () => {
             `div[data-index="${item.index - 1}"]`
           );
           if (elem) {
-            // console.log(`Елемент знайдено index: ${item.index - 1}`);
             elem.style.display = "none"; //ховаємо елемент
-            // console.log(`Ховаю елемент: ${JSON.stringify(item)}`);
           }
-          //  else {
-          // console.log(`Елемент не знайдено ${JSON.stringify(item)}`);
-          // }
         } else {
           const elem = document.querySelector(
             `div[data-index="${item.index - 1}"]`
@@ -163,6 +158,17 @@ window.onload = () => {
               sprite.style.bottom = "10px";
               sprite.style.right = "35px";
               elem.append(sprite);
+              sprite.addEventListener("click", () => {
+                if (sprite.classList.contains("icon-plus")) {
+                  sprite.classList.remove("icon-plus");
+                  sprite.classList.add("icon-minus");
+                  elem.style.border = "2px solid green";
+                } else {
+                  sprite.classList.remove("icon-minus");
+                  sprite.classList.add("icon-plus");
+                  elem.style.border = "2px solid red";
+                }
+              });
             }
           }
         }
