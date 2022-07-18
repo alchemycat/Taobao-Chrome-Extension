@@ -3,14 +3,14 @@
   height: 100vh;
   box-sizing: border-box;
 }
-.container {
-  width: 540px;
-  margin: 0 auto;
-  height: 100vh;
-}
-.settings {
+.row {
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+}
+.settings__header {
+  font-size: 22px;
+  line-height: 22px;
+  margin: 0;
 }

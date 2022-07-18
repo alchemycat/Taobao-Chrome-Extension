@@ -1,7 +1,7 @@
 window.onload = () => {
   (async () => {
     //Отримуємо дані які зараз в storage
-    let mrg = await getStorageData("minimalRating");
+    let mrg = parseInt(await getStorageData("minimalRating"));
     let isChecked = await getStorageData("whitelistChecked");
     let whitelist = await getStorageData("whitelist");
     let data;
@@ -80,7 +80,9 @@ window.onload = () => {
         const auctionIndex = data.findIndex((obj) => obj.nid == nid); //перевіряємо чи є в масиві з отриманими даними такий елемент
 
         if (auctionIndex == -1) {
-          console.log(`Такого елементу немає у массиві`);
+          console.log(
+            `Nid: ${nid} немає у массиві з даними: ${JSON.stringify(data)}`
+          );
           return; //якщо елементу немає тоді йдемо далі
         }
 
@@ -95,6 +97,7 @@ window.onload = () => {
 
         if (!result) {
           auction.style.display = "none"; //додаємо display: none; якщо елемент не підходить
+          console.log(`NID: ${target.nid} Ховаю елемент`);
         }
       });
     }
@@ -122,7 +125,12 @@ window.onload = () => {
       //keys = ["delivery", "description", "service"]
       keys.forEach((item) => {
         //Перевіряємо чи наш елемент має в собі delivery,description,service а також одразу і перевіряємо рейтинг
-        if (target.shopcard[item] && target.shopcard[item][0] > mrg) {
+        if (
+          target.shopcard &&
+          target.shopcard[item] &&
+          Array.isArray(target.shopcard[item]) &&
+          target.shopcard[item][0] >= mrg
+        ) {
           success += 1; //якщо правило проходить тоді дописуємов +1 до успішних ітерацій
         }
       });

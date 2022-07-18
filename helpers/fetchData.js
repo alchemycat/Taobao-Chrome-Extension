@@ -30,11 +30,16 @@ function fetchData(url) {
     })
     .then((result) => {
       // Тут обробляємо result
-      let json = result
-        .match(/(?<=g_page_config\ =).*}};/)[0]
-        .trim()
-        .replace("}};", "}}");
-
+      let json;
+      if (/(?<=g_page_config\ =).*}};/.test(result)) {
+        json = result
+          .match(/(?<=g_page_config\ =).*}};/)[0]
+          .trim()
+          .replace("}};", "}}");
+      } else if (/(?<=\()\{[\w\W]*}(?=\);)/.test(result)) {
+        json = result.match(/(?<=\()\{[\w\W]*}(?=\);)/)[0].trim();
+        console.log(json);
+      }
       //Відправляємо json на сторінку
       window.postMessage(
         {
