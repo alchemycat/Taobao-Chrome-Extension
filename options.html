@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="options.css" />
+    <title>Taobao [Options]</title>
+  </head>
+  <body class="options">
+    <div class="container">
+      <section class="settings">
+        <div class="settings__field rating">
+          <div class="mb-3">
+            <label for="mrg" class="form-label">Мінімальний рейтинг</label>
+            <input
+              type="text"
+              class="form-control"
+              id="mrg"
+              placeholder="rating"
+            />
+          </div>
+        </div>
+        <div class="settings__field wl">
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="whitelist_checkbox"
+            />
+            <label class="form-check-label" for="whitelist_checkbox"
+              >Включити White List</label
+            >
+          </div>
+          <div class="input-group">
+            <textarea
+              class="form-control"
+              aria-label="With textarea"
+              placeholder="While List"
+              id="whitelist"
+              rows="10"
+            ></textarea>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="helpers/getStorageData.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
