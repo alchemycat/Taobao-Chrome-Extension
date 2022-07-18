@@ -38,7 +38,6 @@ function fetchData(url) {
           .replace("}};", "}}");
       } else if (/(?<=\()\{[\w\W]*}(?=\);)/.test(result)) {
         json = result.match(/(?<=\()\{[\w\W]*}(?=\);)/)[0].trim();
-        console.log(json);
       }
       //Відправляємо json на сторінку
       window.postMessage(

@@ -50,43 +50,64 @@ window.onload = () => {
         data = event.data.formatted;
         chrome.storage.local.set({ data });
         changeVisibility(data, whitelist);
-      } else {
-        console.log(event);
       }
     });
     //--------------------------
 
     //Функція яка ховає та показує елементи
     function changeVisibility(data, whitelist) {
-      const auctionsItem = document.querySelectorAll(
-        '[data-category="auctions"]'
-      ); //шукаємо всі елементи auctions
+      let json = [];
 
-      auctionsItem.forEach((item) => {
-        item.style.display = "none";
+      data.forEach((item, i) => {
+        let newJson = {};
+
+        newJson.itemID = item.nid;
+        newJson.shopID = item.user_id;
+        newJson.longTitle = item.raw_title;
+        newJson.shortTitle = item.raw_title.match(/\w+/g).join(" | ");
+        newJson.volumeOfSales = item.view_sales;
+        newJson.picUrl = item.pic_url;
+        newJson.delivery = item.shopcard.delivery[0] || false;
+        newJson.description = item.shopcard.description[0] || false;
+        newJson.service = item.shopcard.service[0] || false;
+
+        json.push(newJson);
       });
 
-      let filteredData;
+      console.log(json);
+      // //--------------------------
+      // const auctionsItem = document.querySelectorAll(
+      //   '[data-category="auctions"]'
+      // ); //шукаємо всі елементи auctions
 
-      filteredData = data.filter(
-        (item) =>
-          item.shopcard["delivery"][0] >= mrg &&
-          item.shopcard["description"][0] >= mrg &&
-          item.shopcard["service"][0] >= mrg
-      );
+      // auctionsItem.forEach((item) => {
+      //   item.style.display = "none";
+      // });
 
-      if (isChecked) {
-        let wl = whitelist.split("\n"); //перетворюємо дані з whitelist у массив
-        filteredData = filteredData.filter((item) => !wl.includes(item.nid));
-      }
+      // let filteredData;
 
-      filteredData.forEach((item) => {
-        let elem = document.querySelector(`a[trace-nid="${item.nid}"]`);
-        if (elem) {
-          elem.parentElement.parentElement.parentElement.parentElement.style.display =
-            "block";
-        }
-      });
+      // filteredData = data.filter((item) => {
+      //   if (
+      //     item.shopcard["delivery"][0] >= mrg &&
+      //     item.shopcard["description"][0] >= mrg &&
+      //     item.shopcard["service"][0] >= mrg
+      //   ) {
+      //     return item;
+      //   }
+      // });
+
+      // if (isChecked) {
+      //   let wl = whitelist.split("\n"); //перетворюємо дані з whitelist у массив
+      //   filteredData = filteredData.filter((item) => wl.includes(item.user_id));
+      // }
+
+      // filteredData.forEach((item) => {
+      //   auctionsItem.forEach((auction) => {
+      //     if (auction.querySelector(`a[trace-nid="${item.nid}"]`)) {
+      //       auction.style.display = "block";
+      //     }
+      //   });
+      // });
     }
     //--------------------------
   })();
