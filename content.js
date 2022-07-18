@@ -14,21 +14,7 @@ window.onload = () => {
     let data;
     //--------------------------
 
-    //Обсервер який слідкує за змінами на сторінці
-    var previousUrl = "";
-
-    var observer = new MutationObserver(async function (mutations) {
-      if (location.href !== previousUrl) {
-        previousUrl = location.href;
-
-        //Робимо запит для оновлення даних
-        fetchData(location.href);
-      }
-    });
-
-    const config = { subtree: true, childList: true };
-    observer.observe(document, config);
-    //--------------------------
+    fetchData(location.href);
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
@@ -60,6 +46,12 @@ window.onload = () => {
       }
     });
     //--------------------------
+
+    chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
+      if (response.type == "URL_CHANGED") {
+        fetchData(location.href);
+      }
+    });
 
     //Функція яка ховає та показує елементи
     function changeVisibility(data, whitelist) {
@@ -108,8 +100,8 @@ window.onload = () => {
 
       json = json.map((item, i) => {
         if (
-          item.delivery < mrg &&
-          item.description < mrg &&
+          item.delivery < mrg ||
+          item.description < mrg ||
           item.service < mrg
         ) {
           item.filter = false;
@@ -146,6 +138,7 @@ window.onload = () => {
           );
           if (elem) {
             const isExist = elem.querySelector(".sprite");
+
             if (!isExist) {
               let sprite = document.createElement("div");
               sprite.classList.add("sprite");
@@ -153,11 +146,13 @@ window.onload = () => {
               sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
                 "assets/sprite/sprite.png"
               )})`;
-              elem.style.position = "relative";
               sprite.style.position = "absolute";
               sprite.style.bottom = "10px";
               sprite.style.right = "35px";
+
+              elem.style.position = "relative";
               elem.append(sprite);
+
               sprite.addEventListener("click", () => {
                 if (sprite.classList.contains("icon-plus")) {
                   sprite.classList.remove("icon-plus");

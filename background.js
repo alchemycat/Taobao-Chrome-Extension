@@ -9,12 +9,8 @@ chrome.action.onClicked.addListener(function (tab) {
   });
 });
 
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//   // Additionally, you can check for changeInfo.status
-//   // if (/^https:\/\/s\.taobao.com/.test(tab.url)) {
-//   //   chrome.action.setPopup({
-//   //     tabId: tab.id, // Set the new popup for this tab.
-//   //     popup: "popup.html", // Open this html file within the popup.
-//   //   });
-//   // }
-// });
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if (/taobao\.com\/search/.test(changeInfo.url)) {
+    chrome.tabs.sendMessage(tabId, { type: "URL_CHANGED" });
+  }
+});
