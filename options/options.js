@@ -213,7 +213,14 @@ window.onload = () => {
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
 
-    //Таблиці
+    //Показати таблиці
+    const list = await getStorageData("list");
+
+    if (!list) {
+      chrome.storage.local.set({ list: [] });
+    }
+
+    //Додати таблицю
 
     const buttonSpreadsheet = document.querySelector("#add_spreadsheet");
 
@@ -226,46 +233,86 @@ window.onload = () => {
 
       if (!name.value) {
         name.focus();
-        addError(buttonSpreadsheet, "Додайте назву");
+        addNotification(buttonSpreadsheet, "Додайте назву", "error");
         return;
       }
       if (!postLink.value) {
         postLink.focus();
-        addError(
+        addNotification(
           buttonSpreadsheet,
-          "Додайте посилання для відправки POST запиту"
+          "Додайте посилання для відправки POST запиту",
+          "error"
         );
         return;
       }
       if (!spreadsheetLink.value) {
         spreadsheetLink.focus();
-        addError(buttonSpreadsheet, "Додайте посилання на таблицю");
+        addNotification(
+          buttonSpreadsheet,
+          "Додайте посилання на таблицю",
+          "error"
+        );
         return;
       }
 
-      if (list.length) {
-        list.push({ name, postLink, spreadsheetLink });
-        chrome.storage.local.set({ list });
+      let resultIndex = list.findIndex((elem) => elem.name === name.value);
+
+      console.log(`Result index: ${resultIndex}`);
+
+      if (!resultIndex) {
+        name.focus();
+        addNotification(
+          buttonSpreadsheet,
+          "Вкажіть іншу назву, вже є таблиця з такою назвою",
+          "error"
+        );
+        return;
       } else {
-        chrome.storage.local.set({
-          list: [{ name, postLink, spreadsheetLink }],
+        list.push({
+          name: name.value,
+          postLink: postLink.value,
+          spreadsheetLink: spreadsheetLink.value,
         });
+        chrome.storage.local.set({ list });
+        addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
+        let allList = await getStorageData("list");
+        console.log(`List: ${JSON.stringify(allList)}`);
       }
     });
 
-    //errors
-    function addError(target, text) {
+    //notifications
+    function addNotification(target, text, type) {
       let errors = document.querySelectorAll(".error");
+      let success = document.querySelectorAll(".success");
 
       errors.forEach((item) => {
         item.remove();
       });
+      success.forEach((item) => {
+        item.remove();
+      });
 
-      let error = document.createElement("div");
-      error.setAttribute("class", "error mt-1");
-      error.style.cssText = "color: red; font-size: 15px;";
-      error.textContent = text;
-      target.parentElement.parentElement.append(error);
+      let notificaiton = document.createElement("div");
+      notificaiton.setAttribute("class", `${type} mt-1`);
+      let color;
+
+      if (type == "error") {
+        color = "red";
+      } else {
+        color = "green";
+      }
+
+      notificaiton.style.cssText = `color: ${color}; font-size: 15px;`;
+
+      notificaiton.textContent = text;
+
+      target.parentElement.parentElement.append(notificaiton);
+
+      setTimeout(() => {
+        try {
+          notificaiton.remove();
+        } catch {}
+      }, 4000);
     }
   })();
 };
