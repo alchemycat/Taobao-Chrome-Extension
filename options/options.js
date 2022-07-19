@@ -41,8 +41,7 @@ window.onload = () => {
 
     monkeyCheckbox.addEventListener("change", async () => {
       chrome.storage.local.set({ monkeyChecked: monkeyCheckbox.checked });
-      json = await getStorageData("json");
-      console.log(JSON.stringify(json));
+      // json = await getStorageData("json");
       addToTable(json);
     });
 
@@ -111,12 +110,10 @@ window.onload = () => {
     });
 
     //Додавання даних до таблиці
-    chrome.storage.onChanged.addListener((changes) => {
-      console.log(changes);
-      if (changes.json.newValue) {
-        json = changes.json.newValue;
-        addToTable(json);
-      }
+    chrome.storage.onChanged.addListener(async (changes) => {
+      json = await getStorageData("json");
+      console.log(json);
+      addToTable(json);
     });
 
     async function addToTable(data) {

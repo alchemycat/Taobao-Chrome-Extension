@@ -56,7 +56,7 @@ window.onload = () => {
     });
 
     //Функція яка ховає та показує елементи
-    function changeVisibility(data, whitelist) {
+    async function changeVisibility(data, whitelist) {
       let json = [];
 
       document
@@ -101,6 +101,13 @@ window.onload = () => {
         }
       });
 
+      let jsonLength = await getStorageData("json");
+      console.log(jsonLength);
+
+      if (!jsonLength.length) {
+        chrome.storage.local.set({ json });
+      }
+
       json = json.map((item, i) => {
         if (
           item.delivery < mrg ||
@@ -127,7 +134,6 @@ window.onload = () => {
         });
       }
 
-      // chrome.storage.local.set({ json });
       // console.log(JSON.stringify(json));
       json.forEach((item) => {
         if (!item.filter) {
