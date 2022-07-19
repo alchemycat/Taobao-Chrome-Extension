@@ -169,14 +169,14 @@ window.onload = () => {
                 if (sprite.classList.contains("icon-plus")) {
                   sprite.classList.remove("icon-plus");
                   sprite.classList.add("icon-minus");
-                  elem.style.border = "2px solid green";
+                  elem.style.border = "1px solid green";
                   item.toSave = true;
                   console.log("saved");
                   chrome.storage.local.set({ json });
                 } else {
                   sprite.classList.remove("icon-minus");
                   sprite.classList.add("icon-plus");
-                  elem.style.border = "2px solid red";
+                  elem.style.border = "1px solid red";
                   item.toSave = false;
                   chrome.storage.local.set({ json });
                 }
