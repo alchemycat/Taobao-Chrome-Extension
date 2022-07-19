@@ -214,17 +214,18 @@ window.onload = () => {
     });
 
     //Показати опції
-    // chrome.storage.local.set({ list: [] });
+    chrome.storage.local.set({ list: [] });
     async function showOptions() {
       const select = document.getElementById("select");
       const options = document.querySelectorAll("option[value]");
       let list = await getStorageData("list");
 
       try {
-        console.log(`show list: ${JSON.stringify(list)}`);
+        // console.log(`show list: ${JSON.stringify(list)}`);
 
-        if (!list) {
+        if (!list.length) {
           chrome.storage.local.set({ list: [] });
+          select.setAttribute("disabled", true);
         }
 
         if (options) {
@@ -285,6 +286,7 @@ window.onload = () => {
       const name = document.getElementById("name");
       const postLink = document.getElementById("post_link");
       const spreadsheetLink = document.getElementById("spreadsheet_link");
+      const select = document.getElementById("select");
 
       let list = await getStorageData("list");
 
@@ -336,7 +338,7 @@ window.onload = () => {
 
         form.reset();
 
-        console.log(`list: ${JSON.stringify(list)}`);
+        select.removeAttribute("disabled");
 
         chrome.storage.local.set({ list });
         addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");

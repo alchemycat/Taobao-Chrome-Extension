@@ -15,19 +15,37 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   }
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.json) {
-    fetch(
-      "https://script.google.com/macros/s/AKfycbxeABBmD4eaoIgmw82OXHSJpQ1FPpxGH4loq6a6MwZvPRRiRKQ4HCzOmP-6UDdVBDyAkw/exec",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request.json),
-      }
-    ).then((response) => {
+    const spreadsheetList = await getStorageData("list");
+
+    const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
+
+    const item = spreadsheetList[itemIndex];
+
+    const { spreadsheetLink, postLink } = item;
+
+    fetch(postLink, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: spreadsheetLink, body: request.json }),
+    }).then((response) => {
       console.log(response);
     });
   }
 });
+
+function getStorageData(sKey) {
+  return new Promise(function (resolve, reject) {
+    chrome.storage.local.get(sKey, function (items) {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+        reject(chrome.runtime.lastError.message);
+      } else {
+        resolve(items[sKey]);
+      }
+    });
+  });
+}
