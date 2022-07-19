@@ -68,6 +68,7 @@ window.onload = () => {
 
     send.addEventListener("click", async (e) => {
       e.preventDefault();
+      let checked = await getStorageData("monkeyChecked");
       note = document.querySelector("#note");
       error = document.querySelector(".error");
       json = await getStorageData("json");
@@ -79,6 +80,7 @@ window.onload = () => {
         if (!send.getAttribute("disabled")) {
           send.setAttribute("disabled", true);
         }
+        return;
       }
 
       if (!json.length) {
@@ -87,7 +89,17 @@ window.onload = () => {
         if (!send.getAttribute("disabled")) {
           send.setAttribute("disabled", true);
         }
+        return;
       }
+
+      let data = [];
+      if (checked) {
+        data = json.filter((item) => item.toSave);
+      } else {
+        data = json;
+      }
+
+      chrome.runtime.sendMessage({ json: data }, () => {});
     });
 
     //Додавання даних до таблиці
@@ -95,14 +107,11 @@ window.onload = () => {
       console.log(changes);
       if (changes.json.newValue) {
         json = changes.json.newValue;
-        console.log("Вызываю функцию add to table");
         addToTable(json);
       }
     });
 
     async function addToTable(data) {
-      console.log(`Функция addToTable`);
-
       const table = document.querySelector("table");
       let checked = await getStorageData("monkeyChecked");
 
@@ -119,7 +128,6 @@ window.onload = () => {
       data.forEach((item, i) => {
         if (checked) {
           if (item.toSave) {
-            console.log(`item save: ${item.toSave}`);
             row = `<tr class="table-row">
             <th scope="row">${item.itemID}</th>
             <td>${item.shopID}</td>

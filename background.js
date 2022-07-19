@@ -18,7 +18,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.json) {
     fetch(
-      "https://script.google.com/macros/s/AKfycbxiUibXuuMsMShKZK6meCgDqz8nGN_-eD7Sb6j65o0N4dFOItA0aoI0-MzWNFbkRcEZ3g/exec",
+      "https://script.google.com/macros/s/AKfycbxeABBmD4eaoIgmw82OXHSJpQ1FPpxGH4loq6a6MwZvPRRiRKQ4HCzOmP-6UDdVBDyAkw/exec",
       {
         method: "POST", // or 'PUT'
         headers: {

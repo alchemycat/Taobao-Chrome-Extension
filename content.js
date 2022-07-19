@@ -165,9 +165,6 @@ window.onload = () => {
                   item.toSave = true;
                   console.log("saved");
                   chrome.storage.local.set({ json });
-                  // chrome.runtime.sendMessage({ json: item }, () => {
-                  //   console.log("sended to bg");
-                  // });
                 } else {
                   sprite.classList.remove("icon-minus");
                   sprite.classList.add("icon-plus");
