@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     fetch(
       "https://script.google.com/macros/s/AKfycbxeABBmD4eaoIgmw82OXHSJpQ1FPpxGH4loq6a6MwZvPRRiRKQ4HCzOmP-6UDdVBDyAkw/exec",
       {
-        method: "POST", // or 'PUT'
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },

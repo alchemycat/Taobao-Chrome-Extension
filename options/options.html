@@ -14,45 +14,54 @@
   </head>
   <body class="options">
     <div class="container-lg">
-      <div class="row">
-        <div class="col-3">
-          <div
-            class="nav flex-column nav-pills me-3"
-            role="tablist"
-            aria-orientation="vertical"
-          >
-            <button
-              class="nav-link active"
-              data-bs-toggle="pill"
-              type="button"
-              role="tab"
-              aria-selected="true"
-            >
-              Критерії фільтрації
-            </button>
-            <button
-              class="nav-link"
-              data-bs-toggle="pill"
-              type="button"
-              role="tab"
-              aria-selected="false"
-            >
-              Збереження пошукової видачі
-            </button>
-          </div>
-        </div>
-        <div class="col-9">
-          <div class="tab-content" id="filter_settings">
+      <div class="options__wrapper">
+        <div class="row">
+          <div class="col-3">
             <div
-              class="tab-pane fade show active"
-              role="tabpanel"
-              aria-labelledby="v-pills-home-tab"
-              tabindex="0"
+              class="nav flex-column nav-pills me-3"
+              role="tablist"
+              aria-orientation="vertical"
             >
-              <div class="settings__wrapper">
+              <button
+                class="nav-link active"
+                data-bs-toggle="pill"
+                type="button"
+                role="tab"
+                aria-selected="true"
+              >
+                Критерії фільтрації
+              </button>
+              <button
+                class="nav-link"
+                data-bs-toggle="pill"
+                type="button"
+                role="tab"
+                aria-selected="false"
+              >
+                Збереження пошукової видачі
+              </button>
+              <button
+                class="nav-link"
+                data-bs-toggle="pill"
+                type="button"
+                role="tab"
+                aria-selected="false"
+              >
+                Налаштування таблиць
+              </button>
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="tab-content" id="filter_settings">
+              <div
+                class="tab-pane fade show active"
+                role="tabpanel"
+                aria-labelledby="v-pills-home-tab"
+                tabindex="0"
+              >
                 <h2 class="settings__header">Критерії фільтрації</h2>
                 <hr />
-                <div class="settings__field rating">
+                <div class="rating">
                   <div class="mb-3">
                     <label for="mrg" class="form-label"
                       >Мінімальний рейтинг</label
@@ -65,7 +74,7 @@
                     />
                   </div>
                 </div>
-                <div class="settings__field wl">
+                <div class="wl">
                   <div class="mb-3 form-check">
                     <input
                       type="checkbox"
@@ -87,57 +96,131 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div
-              class="tab-pane fade"
-              role="tabpanel"
-              aria-labelledby="v-pills-profile-tab"
-              tabindex="0"
-            >
-              <h2 class="settings__header">Збереження пошукової видачі</h2>
-              <hr />
-              <div class="input-group flex-nowrap mb-3">
-                <span class="input-group-text" id="addon-wrapping">idNote</span>
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Ваша примітка"
-                  aria-label="note"
-                  id="note"
-                  aria-describedby="addon-wrapping"
-                />
+              <div
+                class="tab-pane fade"
+                role="tabpanel"
+                aria-labelledby="v-pills-profile-tab"
+                tabindex="0"
+              >
+                <h2 class="settings__header">Збереження пошукової видачі</h2>
+                <hr />
+                <div class="input-group flex-nowrap mb-3">
+                  <span class="input-group-text" id="addon-wrapping"
+                    >idNote</span
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Ваша примітка"
+                    aria-label="note"
+                    id="note"
+                    aria-describedby="addon-wrapping"
+                  />
+                </div>
+                <hr />
+                <div class="table-wrapper-scroll-y my-custom-scrollbar mb-3">
+                  <table class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">itemID</th>
+                        <th scope="col">shopID</th>
+                        <th scope="col">volumeOfSales</th>
+                        <th scope="col">shortTitle</th>
+                        <th scope="col">picUrl</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-body"></tbody>
+                  </table>
+                </div>
+                <hr />
+                <div class="mb-3 form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="monkey_filter"
+                  />
+                  <label class="form-check-label" for="monkey_filter"
+                    >Ручна фільтрація</label
+                  >
+                </div>
+                <div class="input-group d-flex align-items-center">
+                  <button type="button" class="btn btn-primary" id="send">
+                    Збереження пошукової видачі
+                  </button>
+                  <div class="error hide ms-3"></div>
+                </div>
               </div>
-              <hr />
-              <div class="table-wrapper-scroll-y my-custom-scrollbar mb-3">
-                <table class="table table-bordered table-striped">
-                  <thead>
-                    <tr>
-                      <th scope="col">itemID</th>
-                      <th scope="col">shopID</th>
-                      <th scope="col">volumeOfSales</th>
-                      <th scope="col">shortTitle</th>
-                      <th scope="col">picUrl</th>
-                    </tr>
-                  </thead>
-                  <tbody class="table-body"></tbody>
-                </table>
-              </div>
-              <hr />
-              <div class="mb-3 form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="monkey_filter"
-                />
-                <label class="form-check-label" for="monkey_filter"
-                  >Ручна фільтрація</label
+              <div
+                class="tab-pane fade"
+                role="tabpanel"
+                aria-labelledby="v-pills-home-tab"
+                tabindex="0"
+              >
+                <h2 class="settings__header">Налаштування таблиць</h2>
+                <hr />
+                <div
+                  class="row d-flex align-items-center justify-content-center"
                 >
-              </div>
-              <div class="input-group d-flex align-items-center">
-                <button type="button" class="btn btn-primary" id="send">
-                  Збереження пошукової видачі
-                </button>
-                <div class="error hide ms-3"></div>
+                  <div class="col">
+                    <label for="name" class="form-label">Назва:</label>
+
+                    <div class="input-group mb-3">
+                      <span class="input-group-text" id="basic-addon1"
+                        >Назва:</span
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        aria-describedby="basic-addon1"
+                      />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <label for="post_link" class="form-label"
+                      >Посилання за яким відправляти дані</label
+                    >
+
+                    <div class="input-group mb-3">
+                      <span class="input-group-text" id="basic-addon2"
+                        >URL:</span
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="post_link"
+                        aria-describedby="basic-addon2"
+                      />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <label for="spreadsheet_link" class="form-label"
+                      >Посилання на таблицю</label
+                    >
+                    <div class="input-group mb-3">
+                      <span class="input-group-text" id="basic-addon3"
+                        >URL:</span
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="spreadsheet_link"
+                        aria-describedby="basic-addon3"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      id="add_spreadsheet"
+                    >
+                      Додати таблицю
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

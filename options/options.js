@@ -212,5 +212,60 @@ window.onload = () => {
       //додаємо отримані дані у storage
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
+
+    //Таблиці
+
+    const buttonSpreadsheet = document.querySelector("#add_spreadsheet");
+
+    buttonSpreadsheet.addEventListener("click", async () => {
+      const name = document.querySelector("#name");
+      const postLink = document.querySelector("#post_link");
+      const spreadsheetLink = document.querySelector("#spreadsheet_link");
+
+      let list = await getStorageData("list");
+
+      if (!name.value) {
+        name.focus();
+        addError(buttonSpreadsheet, "Додайте назву");
+        return;
+      }
+      if (!postLink.value) {
+        postLink.focus();
+        addError(
+          buttonSpreadsheet,
+          "Додайте посилання для відправки POST запиту"
+        );
+        return;
+      }
+      if (!spreadsheetLink.value) {
+        spreadsheetLink.focus();
+        addError(buttonSpreadsheet, "Додайте посилання на таблицю");
+        return;
+      }
+
+      if (list.length) {
+        list.push({ name, postLink, spreadsheetLink });
+        chrome.storage.local.set({ list });
+      } else {
+        chrome.storage.local.set({
+          list: [{ name, postLink, spreadsheetLink }],
+        });
+      }
+    });
+
+    //errors
+    function addError(target, text) {
+      let errors = document.querySelectorAll(".error");
+
+      errors.forEach((item) => {
+        item.remove();
+      });
+
+      let error = document.createElement("div");
+      error.setAttribute("class", "error mt-1");
+      error.style.cssText = "color: red; font-size: 15px;";
+      error.textContent = text;
+      target.parentElement.parentElement.append(error);
+    }
   })();
 };
