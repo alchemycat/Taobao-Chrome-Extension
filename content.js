@@ -13,6 +13,7 @@ window.onload = () => {
     let whitelist = await getStorageData("whitelist");
     let data;
     //--------------------------
+    chrome.storage.local.set({ json: [] });
 
     fetchData(location.href);
 
@@ -49,6 +50,7 @@ window.onload = () => {
 
     chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
       if (response.type == "URL_CHANGED") {
+        chrome.storage.local.set({ json: [] });
         fetchData(location.href);
       }
     });

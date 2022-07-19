@@ -94,9 +94,17 @@ window.onload = () => {
 
       let data = [];
       if (checked) {
-        data = json.filter((item) => item.toSave);
+        data = json.filter((item) => {
+          if (item.toSave) {
+            item.idNote = note.value;
+            return item;
+          }
+        });
       } else {
-        data = json;
+        data = json.map((item) => {
+          item.idNote = note.value;
+          return item;
+        });
       }
 
       chrome.runtime.sendMessage({ json: data }, () => {});
