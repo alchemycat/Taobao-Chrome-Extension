@@ -214,55 +214,65 @@ window.onload = () => {
     });
 
     //Показати опції
-
+    // chrome.storage.local.set({ list: [] });
     async function showOptions() {
       const select = document.getElementById("select");
       const options = document.querySelectorAll("option[value]");
-      const list = await getStorageData("list");
+      let list = await getStorageData("list");
 
-      if (!list) {
-        chrome.storage.local.set({ list: [] });
-      }
+      try {
+        console.log(`show list: ${JSON.stringify(list)}`);
 
-      if (options) {
-        options.forEach((item) => {
-          item.remove();
-        });
-      }
-
-      list.forEach((item) => {
-        const option = document.createElement("option");
-        option.value = item.name;
-        option.textContent = item.name;
-        if (item.selected) {
-          option.setAttribute("selected", true);
+        if (!list) {
+          chrome.storage.local.set({ list: [] });
         }
-        select.append(option);
-      });
+
+        if (options) {
+          options.forEach((item) => {
+            item.remove();
+          });
+        }
+
+        list.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.name;
+          option.textContent = item.name;
+          if (item.selected) {
+            option.setAttribute("selected", true);
+          }
+          select.append(option);
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
 
+    showOptions();
     //Змінити опцію
     select.addEventListener("change", async (e) => {
       const name = e.target.value;
-      const list = await getStorageData("list");
+      let list = await getStorageData("list");
+      try {
+        document.querySelector(`option[selected]`).removeAttribute("selected");
 
-      document.querySelector(`option[selected]`).removeAttribute("selected");
+        document
+          .querySelector(`option[value="${e.target.value}"]`)
+          .setAttribute("selected", true);
 
-      document
-        .querySelector(`option[value="${e.target.value}"]`)
-        .setAttribute("selected", true);
+        let itemIndex = list.findIndex((elem) => elem.name == name);
 
-      let itemIndex = list.findIndex((elem) => elem.name == name);
+        if (itemIndex) {
+          list = list.map((item) => {
+            item.selected = false;
+            return item;
+          });
 
-      if (itemIndex) {
-        list = list.map((item) => {
-          item.selected = false;
-          return item;
-        });
+          list[itemIndex].selected = true;
 
-        list[itemIndex].selected = true;
-
-        chrome.storage.local.set({ list });
+          chrome.storage.local.set({ list });
+        }
+      } catch (err) {
+        console.log(err);
       }
     });
 
@@ -313,9 +323,8 @@ window.onload = () => {
         );
         return;
       } else {
-        list = list.map((item) => {
+        list.forEach((item) => {
           item.selected = false;
-          return list;
         });
 
         list.push({
@@ -326,6 +335,8 @@ window.onload = () => {
         });
 
         form.reset();
+
+        console.log(`list: ${JSON.stringify(list)}`);
 
         chrome.storage.local.set({ list });
         addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
