@@ -131,25 +131,19 @@ window.onload = () => {
       tbody.classList.add("table-body");
 
       data.forEach((item, i) => {
+        let row = `<tr class="table-row">
+        <th scope="row">${item.itemID}</th>
+        <td>${item.shopID}</td>
+        <td>${item.volumeOfSales}</td>
+        <td>${item.shortTitle}</td>
+        <td>${item.picUrl}</td>
+        </tr>`;
+
         if (checked) {
           if (item.toSave) {
-            row = `<tr class="table-row">
-            <th scope="row">${item.itemID}</th>
-            <td>${item.shopID}</td>
-            <td>${item.volumeOfSales}</td>
-            <td>${item.shortTitle}</td>
-            <td>${item.picUrl}</td>
-            </tr>`;
             tbody.insertAdjacentHTML("afterbegin", row);
           }
         } else {
-          row = `<tr class="table-row">
-          <th scope="row">${item.itemID}</th>
-          <td>${item.shopID}</td>
-          <td>${item.volumeOfSales}</td>
-          <td>${item.shortTitle}</td>
-          <td>${item.picUrl}</td>
-          </tr>`;
           tbody.insertAdjacentHTML("afterbegin", row);
         }
       });
