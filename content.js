@@ -117,6 +117,7 @@ window.onload = () => {
           item.filter = false;
           return item;
         } else {
+          item.toSave = true;
           return item;
         }
       });
@@ -128,6 +129,7 @@ window.onload = () => {
           if (item.filter) {
             if (!wl.includes(item.shopID)) {
               item.filter = false;
+              item.toSave = false;
             }
           }
           return item;
@@ -153,7 +155,7 @@ window.onload = () => {
             if (!isExist) {
               let sprite = document.createElement("div");
               sprite.classList.add("sprite");
-              sprite.classList.add("icon-plus");
+              sprite.classList.add("icon-minus");
               sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
                 "assets/sprite/sprite.png"
               )})`;
@@ -162,6 +164,8 @@ window.onload = () => {
               sprite.style.right = "35px";
 
               elem.style.position = "relative";
+
+              elem.classList.add("green-border");
               elem.append(sprite);
 
               sprite.addEventListener("click", (e) => {
@@ -169,14 +173,14 @@ window.onload = () => {
                 if (sprite.classList.contains("icon-plus")) {
                   sprite.classList.remove("icon-plus");
                   sprite.classList.add("icon-minus");
-                  elem.style.border = "1px solid green";
+                  elem.classList.add("green-border");
                   item.toSave = true;
                   console.log("saved");
                   chrome.storage.local.set({ json });
                 } else {
                   sprite.classList.remove("icon-minus");
                   sprite.classList.add("icon-plus");
-                  elem.style.border = "1px solid red";
+                  elem.classList.add("red-border");
                   item.toSave = false;
                   chrome.storage.local.set({ json });
                 }

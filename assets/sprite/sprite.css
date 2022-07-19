@@ -28,3 +28,23 @@ To change `display` (e.g. `display: inline-block;`), we suggest using a common C
   width: 16px;
   height: 16px;
 }
+
+.green-border::before {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  content: "";
+  border: 2px solid green;
+  height: 101%;
+  width: 101%;
+}
+
+.red-border::before {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  content: "";
+  border: 2px dashed red;
+  height: 101%;
+  width: 101%;
+}

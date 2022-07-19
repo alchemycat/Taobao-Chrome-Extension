@@ -214,7 +214,7 @@ window.onload = () => {
     });
 
     //Показати опції
-    chrome.storage.local.set({ list: [] });
+    // chrome.storage.local.set({ list: [] });
     async function showOptions() {
       const select = document.getElementById("select");
       const options = document.querySelectorAll("option[value]");
