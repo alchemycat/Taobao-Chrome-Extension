@@ -1,5 +1,6 @@
 window.onload = () => {
   (async () => {
+    //Таби
     const navlinks = document.querySelectorAll(".nav-link");
     const tabs = document.querySelectorAll(".tab-pane");
 
@@ -16,6 +17,25 @@ window.onload = () => {
 
         tabs[i].classList.add("show");
         tabs[i].classList.add("active");
+      });
+    });
+
+    //Додавання даних до таблиці
+    chrome.storage.onChanged.addListener((changes) => {
+      console.log(changes.json.newValue);
+      const json = JSON.parse(changes.json.newValue);
+      const tableBody = document.querySelector(".table-body");
+
+      json.forEach((item, i) => {
+        let row = `<tr>
+        <th scope="row">${item.itemID}</th>
+        <td>${item.shopID}</td>
+        <td>${item.longTitle}</td>
+        <td>${item.volumeOfSales}</td>
+        <td>${item.shortTitle}</td>
+        <td>${item.picUrl}</td>
+      </tr>`;
+        tableBody.insertAdjacentHTML("afterbegin", row);
       });
     });
 
