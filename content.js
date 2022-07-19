@@ -125,7 +125,7 @@ window.onload = () => {
         });
       }
 
-      // chrome.storage.local.set({ json });
+      chrome.storage.local.set({ json });
       // console.log(JSON.stringify(json));
       json.forEach((item) => {
         if (!item.filter) {
@@ -162,6 +162,7 @@ window.onload = () => {
                   sprite.classList.add("icon-minus");
                   elem.style.border = "2px solid green";
                   item.toSave = true;
+                  chrome.storage.local.set({ json });
                   // chrome.runtime.sendMessage({ json: item }, () => {
                   //   console.log("sended to bg");
                   // });
@@ -170,6 +171,7 @@ window.onload = () => {
                   sprite.classList.add("icon-plus");
                   elem.style.border = "2px solid red";
                   item.toSave = false;
+                  chrome.storage.local.set({ json });
                 }
               });
             }
