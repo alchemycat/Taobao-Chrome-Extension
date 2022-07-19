@@ -21,11 +21,30 @@ window.onload = () => {
     });
 
     //Додаємо дані в таблицю як тільки відкриваємо сторінку налаштувань
-    const json = await getStorageData("json");
+    let json = await getStorageData("json");
 
     if (json) {
       addToTable(json);
     }
+
+    //Чекбокс ручна фільтрація
+
+    const monkeyCheckbox = document.querySelector("#monkey_filter");
+
+    let isMonkeyChecked = await getStorageData("monkeyChecked");
+
+    if (isMonkeyChecked) {
+      monkeyCheckbox.checked = isMonkeyChecked;
+    } else {
+      monkeyCheckbox.checked = false;
+    }
+
+    monkeyCheckbox.addEventListener("change", async () => {
+      chrome.storage.local.set({ monkeyChecked: monkeyCheckbox.checked });
+      json = await getStorageData("json");
+      console.log(JSON.stringify(json));
+      addToTable(json);
+    });
 
     //Заповнення idNote
 
@@ -47,10 +66,11 @@ window.onload = () => {
 
     //Відправка данних
 
-    send.addEventListener("click", (e) => {
+    send.addEventListener("click", async (e) => {
       e.preventDefault();
       note = document.querySelector("#note");
       error = document.querySelector(".error");
+      json = await getStorageData("json");
 
       if (!note.value.length) {
         error.textContent = "Спочатку заповніть idNote";
@@ -60,28 +80,67 @@ window.onload = () => {
           send.setAttribute("disabled", true);
         }
       }
+
+      if (!json.length) {
+        error.textContent = "Не можна зберігати пустий результат";
+        error.classList.remove("hide");
+        if (!send.getAttribute("disabled")) {
+          send.setAttribute("disabled", true);
+        }
+      }
     });
 
     //Додавання даних до таблиці
     chrome.storage.onChanged.addListener((changes) => {
+      console.log(changes);
       if (changes.json.newValue) {
-        const json = changes.json.newValue;
+        json = changes.json.newValue;
+        console.log("Вызываю функцию add to table");
         addToTable(json);
       }
     });
 
-    function addToTable(data) {
+    async function addToTable(data) {
+      console.log(`Функция addToTable`);
+
+      const table = document.querySelector("table");
+      let checked = await getStorageData("monkeyChecked");
+
       const tableBody = document.querySelector(".table-body");
+
+      if (tableBody) {
+        tableBody.remove();
+      }
+
+      const tbody = document.createElement("tbody");
+
+      tbody.classList.add("table-body");
+
       data.forEach((item, i) => {
-        let row = `<tr>
-        <th scope="row">${item.itemID}</th>
-        <td>${item.shopID}</td>
-        <td>${item.volumeOfSales}</td>
-        <td>${item.shortTitle}</td>
-        <td>${item.picUrl}</td>
-      </tr>`;
-        tableBody.insertAdjacentHTML("afterbegin", row);
+        if (checked) {
+          if (item.toSave) {
+            console.log(`item save: ${item.toSave}`);
+            row = `<tr class="table-row">
+            <th scope="row">${item.itemID}</th>
+            <td>${item.shopID}</td>
+            <td>${item.volumeOfSales}</td>
+            <td>${item.shortTitle}</td>
+            <td>${item.picUrl}</td>
+            </tr>`;
+            tbody.insertAdjacentHTML("afterbegin", row);
+          }
+        } else {
+          row = `<tr class="table-row">
+          <th scope="row">${item.itemID}</th>
+          <td>${item.shopID}</td>
+          <td>${item.volumeOfSales}</td>
+          <td>${item.shortTitle}</td>
+          <td>${item.picUrl}</td>
+          </tr>`;
+          tbody.insertAdjacentHTML("afterbegin", row);
+        }
       });
+      table.append(tbody);
     }
 
     //Пошук елементів в popup

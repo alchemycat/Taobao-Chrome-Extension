@@ -41,7 +41,7 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       if (event.data.type == "FROM_PAGE") {
         data = event.data.formatted;
-        chrome.storage.local.set({ data });
+        // chrome.storage.local.set({ data });
         changeVisibility(data, whitelist);
       }
     });
@@ -125,7 +125,7 @@ window.onload = () => {
         });
       }
 
-      chrome.storage.local.set({ json });
+      // chrome.storage.local.set({ json });
       // console.log(JSON.stringify(json));
       json.forEach((item) => {
         if (!item.filter) {
@@ -156,12 +156,14 @@ window.onload = () => {
               elem.style.position = "relative";
               elem.append(sprite);
 
-              sprite.addEventListener("click", () => {
+              sprite.addEventListener("click", (e) => {
+                e.stopPropagation();
                 if (sprite.classList.contains("icon-plus")) {
                   sprite.classList.remove("icon-plus");
                   sprite.classList.add("icon-minus");
                   elem.style.border = "2px solid green";
                   item.toSave = true;
+                  console.log("saved");
                   chrome.storage.local.set({ json });
                   // chrome.runtime.sendMessage({ json: item }, () => {
                   //   console.log("sended to bg");
