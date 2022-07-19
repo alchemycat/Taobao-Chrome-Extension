@@ -213,12 +213,59 @@ window.onload = () => {
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
 
-    //Показати таблиці
-    const list = await getStorageData("list");
+    //Показати опції
+    chrome.storage.local.set({ list: [] });
 
-    if (!list) {
-      chrome.storage.local.set({ list: [] });
+    async function showOptions() {
+      const select = document.getElementById("select");
+      const options = document.querySelectorAll("option[value]");
+      const list = await getStorageData("list");
+
+      if (!list) {
+        chrome.storage.local.set({ list: [] });
+      }
+
+      if (options) {
+        options.forEach((item) => {
+          item.remove();
+        });
+      }
+
+      list.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.name;
+        option.textContent = item.name;
+        if (item.selected) {
+          option.setAttribute("selected", true);
+        }
+        select.append(option);
+      });
     }
+
+    //Змінити опцію
+    select.addEventListener("change", async (e) => {
+      const name = e.target.value;
+      const list = await getStorageData("list");
+
+      document.querySelector(`option[selected]`).removeAttribute("selected");
+
+      document
+        .querySelector(`option[value="${e.target.value}"]`)
+        .setAttribute("selected", true);
+
+      let itemIndex = list.findIndex((elem) => elem.name == name);
+
+      if (itemIndex) {
+        list = list.map((item) => {
+          item.selected = false;
+          return item;
+        });
+
+        list[itemIndex].selected = true;
+
+        chrome.storage.local.set({ list });
+      }
+    });
 
     //Додати таблицю
 
@@ -257,8 +304,6 @@ window.onload = () => {
 
       let resultIndex = list.findIndex((elem) => elem.name === name.value);
 
-      console.log(`Result index: ${resultIndex}`);
-
       if (!resultIndex) {
         name.focus();
         addNotification(
@@ -268,15 +313,23 @@ window.onload = () => {
         );
         return;
       } else {
+        list = list.map((item) => {
+          item.selected = false;
+          return list;
+        });
+
         list.push({
           name: name.value,
           postLink: postLink.value,
           spreadsheetLink: spreadsheetLink.value,
+          selected: true,
         });
+
         chrome.storage.local.set({ list });
         addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
-        let allList = await getStorageData("list");
-        console.log(`List: ${JSON.stringify(allList)}`);
+        showOptions();
+        // let allList = await getStorageData("list");
+        // console.log(`List: ${JSON.stringify(allList)}`);
       }
     });
 
