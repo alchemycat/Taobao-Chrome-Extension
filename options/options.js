@@ -20,24 +20,69 @@ window.onload = () => {
       });
     });
 
+    //Додаємо дані в таблицю як тільки відкриваємо сторінку налаштувань
+    const json = await getStorageData("json");
+
+    if (json) {
+      addToTable(json);
+    }
+
+    //Заповнення idNote
+
+    let note = document.querySelector("#note");
+    const send = document.querySelector("#send");
+    let error = document.querySelector(".error");
+
+    note.addEventListener("input", () => {
+      if (send.getAttribute("disabled")) {
+        send.removeAttribute("disabled");
+      }
+      if (
+        error.textContent == "Спочатку заповніть idNote" &&
+        !error.classList.contains("hide")
+      ) {
+        error.classList.add("hide");
+      }
+    });
+
+    //Відправка данних
+
+    send.addEventListener("click", (e) => {
+      e.preventDefault();
+      note = document.querySelector("#note");
+      error = document.querySelector(".error");
+
+      if (!note.value.length) {
+        error.textContent = "Спочатку заповніть idNote";
+        error.classList.remove("hide");
+        note.focus();
+        if (!send.getAttribute("disabled")) {
+          send.setAttribute("disabled", true);
+        }
+      }
+    });
+
     //Додавання даних до таблиці
     chrome.storage.onChanged.addListener((changes) => {
-      console.log(changes.json.newValue);
-      const json = JSON.parse(changes.json.newValue);
-      const tableBody = document.querySelector(".table-body");
+      if (changes.json.newValue) {
+        const json = changes.json.newValue;
+        addToTable(json);
+      }
+    });
 
-      json.forEach((item, i) => {
+    function addToTable(data) {
+      const tableBody = document.querySelector(".table-body");
+      data.forEach((item, i) => {
         let row = `<tr>
         <th scope="row">${item.itemID}</th>
         <td>${item.shopID}</td>
-        <td>${item.longTitle}</td>
         <td>${item.volumeOfSales}</td>
         <td>${item.shortTitle}</td>
         <td>${item.picUrl}</td>
       </tr>`;
         tableBody.insertAdjacentHTML("afterbegin", row);
       });
-    });
+    }
 
     //Пошук елементів в popup
     const inputRating = document.getElementById("mrg"),

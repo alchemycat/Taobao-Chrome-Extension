@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
 }
 .settings__header {
   font-size: 22px;
@@ -17,9 +18,19 @@
 
 .my-custom-scrollbar {
   position: relative;
-  height: 200px;
+  height: 350px;
   overflow: auto;
 }
 .table-wrapper-scroll-y {
   display: block;
+}
+
+.error {
+  color: red;
+  font-size: 15px;
+  /* margin-left: 15px; */
+}
+
+.hide {
+  display: none;
 }
