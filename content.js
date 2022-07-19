@@ -91,6 +91,7 @@ window.onload = () => {
           newJson.filter = true;
           newJson.toSave = false;
           newJson.idNote = "";
+          newJson.url = `https://item.taobao.com/item.htm?id=${item.nid}`;
 
           json.push(newJson);
         } catch (err) {
@@ -124,6 +125,8 @@ window.onload = () => {
         });
       }
 
+      // chrome.storage.local.set({ json });
+      // console.log(JSON.stringify(json));
       json.forEach((item) => {
         if (!item.filter) {
           const elem = document.querySelector(
@@ -158,10 +161,15 @@ window.onload = () => {
                   sprite.classList.remove("icon-plus");
                   sprite.classList.add("icon-minus");
                   elem.style.border = "2px solid green";
+                  item.toSave = true;
+                  // chrome.runtime.sendMessage({ json: item }, () => {
+                  //   console.log("sended to bg");
+                  // });
                 } else {
                   sprite.classList.remove("icon-minus");
                   sprite.classList.add("icon-plus");
                   elem.style.border = "2px solid red";
+                  item.toSave = false;
                 }
               });
             }

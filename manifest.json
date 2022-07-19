@@ -29,8 +29,8 @@
       "matches": ["https://s.taobao.com/*"]
     }
   ],
-  "permissions": ["tabs", "storage", "webRequest"],
-  "host_permissions": ["https://s.taobao.com/*"],
+  "permissions": ["tabs", "storage"],
+  "host_permissions": ["https://s.taobao.com/*", "https://script.google.com/*"],
   "action": {
     "default_title": "Taobao"
   }
