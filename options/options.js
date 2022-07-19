@@ -214,7 +214,6 @@ window.onload = () => {
     });
 
     //Показати опції
-    chrome.storage.local.set({ list: [] });
 
     async function showOptions() {
       const select = document.getElementById("select");
@@ -272,9 +271,10 @@ window.onload = () => {
     const buttonSpreadsheet = document.querySelector("#add_spreadsheet");
 
     buttonSpreadsheet.addEventListener("click", async () => {
-      const name = document.querySelector("#name");
-      const postLink = document.querySelector("#post_link");
-      const spreadsheetLink = document.querySelector("#spreadsheet_link");
+      const form = document.getElementById("create_spreadsheet");
+      const name = document.getElementById("name");
+      const postLink = document.getElementById("post_link");
+      const spreadsheetLink = document.getElementById("spreadsheet_link");
 
       let list = await getStorageData("list");
 
@@ -325,11 +325,11 @@ window.onload = () => {
           selected: true,
         });
 
+        form.reset();
+
         chrome.storage.local.set({ list });
         addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
         showOptions();
-        // let allList = await getStorageData("list");
-        // console.log(`List: ${JSON.stringify(allList)}`);
       }
     });
 
