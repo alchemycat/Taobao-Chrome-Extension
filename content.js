@@ -21,20 +21,11 @@ window.onload = () => {
     let data;
     //--------------------------
 
-    // chrome.storage.local.remove(["23", "280", "311", "312", "json"]);
-
     fetchData(location.href);
-
-    chrome.storage.local.get(null, function (items) {
-      console.log(items);
-    });
-
-    chrome.runtime.sendMessage({ type: "PAGE_LOAD" });
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
       if (changes) {
-        // console.log(changes);
         if (changes.minimalRating) {
           mrg = parseInt(changes.minimalRating.newValue);
         }
@@ -47,8 +38,6 @@ window.onload = () => {
         if (isNaN(mrg)) {
           mrg = 0;
         }
-        // let data = await getStorageData(id);
-        // save = data;
         changeVisibility(data, whitelist);
       }
     });
@@ -59,11 +48,9 @@ window.onload = () => {
       if (event.data.type == "DATA") {
         data = event.data.formatted;
         changeVisibility(data, whitelist);
-        // chrome.storage.local.set({ [id]: event.data.formatted });
       }
 
       if (event.data.type == "SAVE") {
-        console.log(event.data.idNote);
         let prepared = save.filter((item) => {
           if (item.toSave) {
             item.idNote = event.data.idNote;
@@ -76,10 +63,6 @@ window.onload = () => {
     //--------------------------
 
     chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
-      // if (response.type == "ID") {
-      //   id = response.id;
-      //   fetchData(location.href);
-      // }
       if (response.type == "URL_CHANGED") {
         save = [];
         fetchData(location.href);
@@ -89,7 +72,6 @@ window.onload = () => {
     //Функція яка ховає та показує елементи
     async function changeVisibility(data, whitelist) {
       let json = [];
-      // console.log(`Функция запущена: ${JSON.stringify(data)}`);
       document
         .querySelectorAll('[data-category="auctions"]')
         .forEach((item) => {
@@ -202,9 +184,7 @@ window.onload = () => {
                 elem.classList.add("green-border");
                 elem.classList.remove("red-border");
                 item.toSave = true;
-                console.log("saved");
                 save = json;
-                // console.log(JSON.stringify(item));
               } else {
                 sprite.classList.remove("icon-minus");
                 sprite.classList.add("icon-plus");
@@ -212,8 +192,6 @@ window.onload = () => {
                 elem.classList.remove("green-border");
                 item.toSave = false;
                 save = json;
-                console.log("deleted");
-                // console.log(JSON.stringify(item));
               }
             });
           }
