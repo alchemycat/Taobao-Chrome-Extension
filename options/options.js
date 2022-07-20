@@ -122,8 +122,6 @@ window.onload = () => {
       let list = await getStorageData("list");
 
       try {
-        // console.log(`show list: ${JSON.stringify(list)}`);
-
         if (!list || !list.length) {
           chrome.storage.local.set({ list: [] });
           select.setAttribute("disabled", true);

@@ -78,9 +78,9 @@ window.onload = () => {
           let newJson = {};
 
           let formattedTitle = item.raw_title
-            .replace(/(\s|)(\p{Script=Han}(\s|))+\p{Script=Han}+(\s|)/gu, " | ")
+            .replace(/(\s|)(\p{Script=Han}+(\s|))\p{Script=Han}+(\s|)/gu, " | ")
+            .replace(/(?<=(\w|\W))\p{Script=Han}+(?=(\w|\W))/gu, " | ")
             .replace(/(^(\s\|\s)|(\s\|\s)$)/g, "");
-
           if (!formattedTitle) {
             formattedTitle = `Keyword ${item.raw_title}`;
           }
