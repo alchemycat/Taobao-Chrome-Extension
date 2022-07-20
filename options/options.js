@@ -78,6 +78,20 @@ window.onload = () => {
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
 
+    //Hotkey
+    const hotkey = document.getElementById("hotkey");
+
+    let keys = await getStorageData("hotkey");
+    if (keys) {
+      hotkey.value = keys;
+    } else {
+      hotkey.value = "Ctrl + S";
+    }
+
+    hotkey.addEventListener("input", () => {
+      chrome.storage.local.set({ hotkey: hotkey.value });
+    });
+
     //Показати опції
     // chrome.storage.local.set({ list: [] });
     async function showOptions() {
@@ -88,7 +102,7 @@ window.onload = () => {
       try {
         // console.log(`show list: ${JSON.stringify(list)}`);
 
-        if (!list.length) {
+        if (!list || !list.length) {
           chrome.storage.local.set({ list: [] });
           select.setAttribute("disabled", true);
         }

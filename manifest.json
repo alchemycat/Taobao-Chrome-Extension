@@ -23,6 +23,7 @@
     {
       "resources": [
         "content.js",
+        "js/inject.js",
         "assets/sprite/sprite.png",
         "assets/sprite/sprite.css"
       ],

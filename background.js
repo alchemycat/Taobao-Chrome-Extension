@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type == "PAGE_LOAD") {
     chrome.tabs.sendMessage(sender.tab.id, { type: "ID", id: sender.tab.id });
   }
-  if (request.json) {
+  if (request.type == "SAVE_DATA") {
     const spreadsheetList = await getStorageData("list");
 
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);

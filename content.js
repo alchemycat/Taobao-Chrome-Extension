@@ -7,11 +7,17 @@ window.onload = () => {
     document.querySelector("head").append(css);
     //--------------------------
 
+    let script = document.createElement("script");
+    script.src = chrome.runtime.getURL("js/inject.js");
+    document.querySelector("head").append(script);
+
     //Отримуємо дані які зараз в storage
     let mrg = parseInt(await getStorageData("minimalRating"));
     let isChecked = await getStorageData("whitelistChecked");
     let whitelist = await getStorageData("whitelist");
+    // let hotkey = await getStorageData("hotkey");
     let id;
+    let save = [];
     //--------------------------
 
     chrome.runtime.sendMessage({ type: "PAGE_LOAD" });
@@ -19,7 +25,7 @@ window.onload = () => {
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
       if (changes) {
-        console.log(changes);
+        // console.log(changes);
         if (changes.minimalRating) {
           mrg = parseInt(changes.minimalRating.newValue);
         }
@@ -33,7 +39,7 @@ window.onload = () => {
           mrg = 0;
         }
         let data = await getStorageData(id);
-
+        save = data;
         changeVisibility(data, whitelist);
       }
     });
@@ -44,6 +50,17 @@ window.onload = () => {
       if (event.data.type == "FROM_PAGE") {
         chrome.storage.local.set({ [id]: event.data.formatted });
       }
+
+      if (event.data.type == "SAVE") {
+        console.log(event.data.idNote);
+        let prepared = save.filter((item) => {
+          if (item.toSave) {
+            item.idNote = event.data.idNote;
+            return item;
+          }
+        });
+        chrome.runtime.sendMessage({ type: "SAVE_DATA", json: prepared });
+      }
     });
     //--------------------------
 
@@ -53,6 +70,7 @@ window.onload = () => {
         fetchData(location.href);
       }
       if (response.type == "URL_CHANGED") {
+        save = [];
         fetchData(location.href);
       }
     });
@@ -60,7 +78,7 @@ window.onload = () => {
     //Функція яка ховає та показує елементи
     async function changeVisibility(data, whitelist) {
       let json = [];
-      console.log(`Функция запущена: ${JSON.stringify(data)}`);
+      // console.log(`Функция запущена: ${JSON.stringify(data)}`);
       document
         .querySelectorAll('[data-category="auctions"]')
         .forEach((item) => {
@@ -130,6 +148,8 @@ window.onload = () => {
         });
       }
 
+      save = json;
+
       json.forEach((item) => {
         if (!item.filter) {
           const elem = document.querySelector(
@@ -175,15 +195,17 @@ window.onload = () => {
                 elem.classList.remove("red-border");
                 item.toSave = true;
                 console.log("saved");
-                console.log(JSON.stringify(item));
+                save = json;
+                // console.log(JSON.stringify(item));
               } else {
                 sprite.classList.remove("icon-minus");
                 sprite.classList.add("icon-plus");
                 elem.classList.add("red-border");
                 elem.classList.remove("green-border");
                 item.toSave = false;
+                save = json;
                 console.log("deleted");
-                console.log(JSON.stringify(item));
+                // console.log(JSON.stringify(item));
               }
             });
           }
