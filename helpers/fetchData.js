@@ -42,7 +42,7 @@ function fetchData(url) {
       //Відправляємо json на сторінку
       window.postMessage(
         {
-          type: "FROM_PAGE",
+          type: "DATA",
           formatted: JSON.parse(json).mods.itemlist.data.auctions,
         },
         "*"

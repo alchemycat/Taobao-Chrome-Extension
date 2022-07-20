@@ -16,9 +16,18 @@ window.onload = () => {
     let isChecked = await getStorageData("whitelistChecked");
     let whitelist = await getStorageData("whitelist");
     // let hotkey = await getStorageData("hotkey");
-    let id;
+    // let id;
     let save = [];
+    let data;
     //--------------------------
+
+    // chrome.storage.local.remove(["23", "280", "311", "312", "json"]);
+
+    fetchData(location.href);
+
+    chrome.storage.local.get(null, function (items) {
+      console.log(items);
+    });
 
     chrome.runtime.sendMessage({ type: "PAGE_LOAD" });
 
@@ -38,8 +47,8 @@ window.onload = () => {
         if (isNaN(mrg)) {
           mrg = 0;
         }
-        let data = await getStorageData(id);
-        save = data;
+        // let data = await getStorageData(id);
+        // save = data;
         changeVisibility(data, whitelist);
       }
     });
@@ -47,8 +56,10 @@ window.onload = () => {
 
     //слухаємо дані які повинні дійти зі сторінки
     window.addEventListener("message", async (event) => {
-      if (event.data.type == "FROM_PAGE") {
-        chrome.storage.local.set({ [id]: event.data.formatted });
+      if (event.data.type == "DATA") {
+        data = event.data.formatted;
+        changeVisibility(data, whitelist);
+        // chrome.storage.local.set({ [id]: event.data.formatted });
       }
 
       if (event.data.type == "SAVE") {
@@ -65,10 +76,10 @@ window.onload = () => {
     //--------------------------
 
     chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
-      if (response.type == "ID") {
-        id = response.id;
-        fetchData(location.href);
-      }
+      // if (response.type == "ID") {
+      //   id = response.id;
+      //   fetchData(location.href);
+      // }
       if (response.type == "URL_CHANGED") {
         save = [];
         fetchData(location.href);
@@ -93,7 +104,7 @@ window.onload = () => {
             .replace(/(^(\s\|\s)|(\s\|\s)$)/g, "");
 
           if (!formattedTitle) {
-            formattedTitle = `Keyword ${target}`;
+            formattedTitle = `Keyword ${item.raw_title}`;
           }
 
           newJson.index = i + 1;
