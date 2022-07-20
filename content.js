@@ -88,17 +88,14 @@ window.onload = () => {
         try {
           let newJson = {};
 
-          let formattedTitle = item.raw_title.match(/\w+/g);
+          let formattedTitle = item.raw_title
+            .replace(/(\s|)(\p{Script=Han}(\s|))+\p{Script=Han}+(\s|)/gu, " | ")
+            .replace(/(^(\s\|\s)|(\s\|\s)$)/g, "");
 
-          if (Array.isArray(formattedTitle)) {
-            if (formattedTitle.length > 1) {
-              formattedTitle = formattedTitle.join(" | ");
-            } else if (formattedTitle.length == 1) {
-              formattedTitle = formattedTitle[0];
-            }
-          } else {
-            formattedTitle = `Keyword ${item.raw_title}`;
+          if (!formattedTitle) {
+            formattedTitle = `Keyword ${target}`;
           }
+
           newJson.index = i + 1;
           newJson.itemID = item.nid;
           newJson.shopID = item.user_id;
