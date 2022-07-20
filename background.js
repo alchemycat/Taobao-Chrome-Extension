@@ -36,7 +36,51 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       console.log(response);
     });
   }
+  if (request.type == "INJECT") {
+    const hotletter = await getStorageData("hotletter");
+    const hotkey = await getStorageData("hotkey");
+
+    chrome.scripting.executeScript({
+      target: {
+        tabId: sender.tab.id,
+      },
+      func: handleKeys,
+      args: [hotletter, hotkey],
+    });
+  }
 });
+
+function handleKeys(hotletter, hotkey) {
+  document.addEventListener(
+    "keydown",
+    async function (e) {
+      let button;
+      switch (hotkey) {
+        case "Control":
+          button = e.ctrlKey;
+          break;
+        case "Alt":
+          button = e.altKey;
+          break;
+        default:
+          button = e.ctrlKey;
+          break;
+      }
+      if (e.key === hotletter && button) {
+        e.preventDefault();
+        let idNote = await prompt("Задайте idNote: ");
+        window.postMessage(
+          {
+            type: "SAVE",
+            idNote: idNote,
+          },
+          "*"
+        );
+      }
+    },
+    false
+  );
+}
 
 function getStorageData(sKey) {
   return new Promise(function (resolve, reject) {

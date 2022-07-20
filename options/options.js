@@ -80,20 +80,42 @@ window.onload = () => {
 
     //Hotkey
     const hotkey = document.getElementById("hotkey");
+    const hotletter = document.getElementById("hotletter");
 
-    let keys = await getStorageData("hotkey");
-    if (keys) {
-      hotkey.value = keys;
+    let key = await getStorageData("hotkey");
+    let letter = await getStorageData("hotletter");
+
+    if (key) {
+      hotkey.value = key;
     } else {
-      hotkey.value = "Ctrl + S";
+      hotkey.value = "Control";
     }
 
-    hotkey.addEventListener("input", () => {
-      chrome.storage.local.set({ hotkey: hotkey.value });
+    if (letter) {
+      hotletter.value = letter;
+    } else {
+      hotletter.value = "s";
+    }
+
+    hotkey.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (e.key == "Control" || e.key == "Alt") {
+        e.target.value = e.key;
+
+        chrome.storage.local.set({ hotkey: hotkey.value });
+      }
+    });
+
+    hotletter.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      e.target.value = e.key;
+      chrome.storage.local.set({ hotletter: hotletter.value });
     });
 
     //Показати опції
-    // chrome.storage.local.set({ list: [] });
     async function showOptions() {
       const select = document.getElementById("select");
       const options = document.querySelectorAll("option[value]");

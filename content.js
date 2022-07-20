@@ -1,27 +1,23 @@
 window.onload = () => {
   (async () => {
-    //
+    //Отримуємо дані які зараз в storage
+    let mrg = parseInt(await getStorageData("minimalRating"));
+    let isChecked = await getStorageData("whitelistChecked");
+    let whitelist = await getStorageData("whitelist");
+
+    let save = [];
+    let data;
+
+    //--------------------------
     let css = document.createElement("link");
     css.rel = "stylesheet";
     css.href = chrome.runtime.getURL("assets/sprite/sprite.css");
     document.querySelector("head").append(css);
     //--------------------------
 
-    let script = document.createElement("script");
-    script.src = chrome.runtime.getURL("js/inject.js");
-    document.querySelector("head").append(script);
-
-    //Отримуємо дані які зараз в storage
-    let mrg = parseInt(await getStorageData("minimalRating"));
-    let isChecked = await getStorageData("whitelistChecked");
-    let whitelist = await getStorageData("whitelist");
-    // let hotkey = await getStorageData("hotkey");
-    // let id;
-    let save = [];
-    let data;
-    //--------------------------
-
     fetchData(location.href);
+
+    chrome.runtime.sendMessage({ type: "INJECT" });
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
