@@ -18,8 +18,8 @@ window.onload = () => {
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
-      let data;
       if (changes) {
+        console.log(changes);
         if (changes.minimalRating) {
           mrg = parseInt(changes.minimalRating.newValue);
         }
@@ -32,12 +32,9 @@ window.onload = () => {
         if (isNaN(mrg)) {
           mrg = 0;
         }
-        if (changes[id]) {
-          data = await getStorageData(id);
-        }
-        if (data.length) {
-          changeVisibility(data, whitelist);
-        }
+        let data = await getStorageData(id);
+
+        changeVisibility(data, whitelist);
       }
     });
     //--------------------------
@@ -148,46 +145,47 @@ window.onload = () => {
           if (elem) {
             const isExist = elem.querySelector(".sprite");
 
-            if (!isExist) {
-              let sprite = document.createElement("div");
-              sprite.classList.add("sprite");
-              sprite.classList.add("icon-minus");
-              sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
-                "assets/sprite/sprite.png"
-              )})`;
-              sprite.style.position = "absolute";
-              sprite.style.bottom = "10px";
-              sprite.style.right = "35px";
-
-              elem.style.position = "relative";
-
+            if (isExist) {
+              isExist.remove();
+              elem.classList.remove("red-border");
               elem.classList.add("green-border");
-
-              elem.append(sprite);
-
-              sprite.addEventListener("click", async (e) => {
-                e.stopPropagation();
-                if (sprite.classList.contains("icon-plus")) {
-                  sprite.classList.remove("icon-plus");
-                  sprite.classList.add("icon-minus");
-                  elem.classList.add("green-border");
-                  elem.classList.remove("red-border");
-                  item.toSave = true;
-                  console.log("saved");
-                  console.log(JSON.stringify(item));
-                  // chrome.storage.local.set({ [id]: json });
-                } else {
-                  sprite.classList.remove("icon-minus");
-                  sprite.classList.add("icon-plus");
-                  elem.classList.add("red-border");
-                  elem.classList.remove("green-border");
-                  item.toSave = false;
-                  console.log("deleted");
-                  console.log(JSON.stringify(item));
-                  // chrome.storage.local.set({ [id]: json });
-                }
-              });
             }
+            let sprite = document.createElement("div");
+            sprite.classList.add("sprite");
+            sprite.classList.add("icon-minus");
+            sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
+              "assets/sprite/sprite.png"
+            )})`;
+            sprite.style.position = "absolute";
+            sprite.style.bottom = "10px";
+            sprite.style.right = "35px";
+
+            elem.style.position = "relative";
+
+            elem.classList.add("green-border");
+
+            elem.append(sprite);
+
+            sprite.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              if (sprite.classList.contains("icon-plus")) {
+                sprite.classList.remove("icon-plus");
+                sprite.classList.add("icon-minus");
+                elem.classList.add("green-border");
+                elem.classList.remove("red-border");
+                item.toSave = true;
+                console.log("saved");
+                console.log(JSON.stringify(item));
+              } else {
+                sprite.classList.remove("icon-minus");
+                sprite.classList.add("icon-plus");
+                elem.classList.add("red-border");
+                elem.classList.remove("green-border");
+                item.toSave = false;
+                console.log("deleted");
+                console.log(JSON.stringify(item));
+              }
+            });
           }
         }
       });

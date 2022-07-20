@@ -21,11 +21,11 @@ window.onload = () => {
     });
 
     //Додаємо дані в таблицю як тільки відкриваємо сторінку налаштувань
-    let json = await getStorageData("json");
+    // let json = await getStorageData("json");
 
-    if (json) {
-      addToTable(json);
-    }
+    // if (json) {
+    // addToTable(json);
+    // }
 
     // //Чекбокс ручна фільтрація
 
@@ -157,6 +157,7 @@ window.onload = () => {
 
     //забираємо дані зі storage про мінімальний рейтинг якщо вони там вже є
     let minimalRating = await getStorageData("minimalRating");
+    console.log(minimalRating);
     if (minimalRating) {
       inputRating.value = minimalRating;
     }
