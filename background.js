@@ -11,11 +11,15 @@ chrome.action.onClicked.addListener(function (tab) {
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (/taobao\.com\/search/.test(changeInfo.url)) {
+    // console.log("URL CHANGED");
     chrome.tabs.sendMessage(tabId, { type: "URL_CHANGED" });
   }
 });
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  if (request.type == "PAGE_LOAD") {
+    chrome.tabs.sendMessage(sender.tab.id, { type: "ID", id: sender.tab.id });
+  }
   if (request.json) {
     const spreadsheetList = await getStorageData("list");
 

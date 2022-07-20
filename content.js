@@ -11,14 +11,14 @@ window.onload = () => {
     let mrg = parseInt(await getStorageData("minimalRating"));
     let isChecked = await getStorageData("whitelistChecked");
     let whitelist = await getStorageData("whitelist");
-    let data;
+    let id;
     //--------------------------
-    chrome.storage.local.set({ json: [] });
 
-    fetchData(location.href);
+    chrome.runtime.sendMessage({ type: "PAGE_LOAD" });
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
+      let data;
       if (changes) {
         if (changes.minimalRating) {
           mrg = parseInt(changes.minimalRating.newValue);
@@ -32,8 +32,12 @@ window.onload = () => {
         if (isNaN(mrg)) {
           mrg = 0;
         }
-        //викликаємо функцію яка змінить відображення елементів на основі нових даних
-        changeVisibility(data, whitelist);
+        if (changes[id]) {
+          data = await getStorageData(id);
+        }
+        if (data.length) {
+          changeVisibility(data, whitelist);
+        }
       }
     });
     //--------------------------
@@ -41,16 +45,17 @@ window.onload = () => {
     //слухаємо дані які повинні дійти зі сторінки
     window.addEventListener("message", async (event) => {
       if (event.data.type == "FROM_PAGE") {
-        data = event.data.formatted;
-        // chrome.storage.local.set({ data });
-        changeVisibility(data, whitelist);
+        chrome.storage.local.set({ [id]: event.data.formatted });
       }
     });
     //--------------------------
 
     chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
+      if (response.type == "ID") {
+        id = response.id;
+        fetchData(location.href);
+      }
       if (response.type == "URL_CHANGED") {
-        chrome.storage.local.set({ json: [] });
         fetchData(location.href);
       }
     });
@@ -58,13 +63,12 @@ window.onload = () => {
     //Функція яка ховає та показує елементи
     async function changeVisibility(data, whitelist) {
       let json = [];
-
+      console.log(`Функция запущена: ${JSON.stringify(data)}`);
       document
         .querySelectorAll('[data-category="auctions"]')
         .forEach((item) => {
           item.style.display = "block";
         }); // спочатку надаємо всім елементам display: block;
-
       data.forEach((item, i) => {
         try {
           let newJson = {};
@@ -101,13 +105,6 @@ window.onload = () => {
         }
       });
 
-      let jsonLength = await getStorageData("json");
-      console.log(jsonLength);
-
-      if (!jsonLength.length) {
-        chrome.storage.local.set({ json });
-      }
-
       json = json.map((item, i) => {
         if (
           item.delivery < mrg ||
@@ -136,7 +133,6 @@ window.onload = () => {
         });
       }
 
-      // console.log(JSON.stringify(json));
       json.forEach((item) => {
         if (!item.filter) {
           const elem = document.querySelector(
@@ -166,23 +162,29 @@ window.onload = () => {
               elem.style.position = "relative";
 
               elem.classList.add("green-border");
+
               elem.append(sprite);
 
-              sprite.addEventListener("click", (e) => {
+              sprite.addEventListener("click", async (e) => {
                 e.stopPropagation();
                 if (sprite.classList.contains("icon-plus")) {
                   sprite.classList.remove("icon-plus");
                   sprite.classList.add("icon-minus");
                   elem.classList.add("green-border");
+                  elem.classList.remove("red-border");
                   item.toSave = true;
                   console.log("saved");
-                  chrome.storage.local.set({ json });
+                  console.log(JSON.stringify(item));
+                  // chrome.storage.local.set({ [id]: json });
                 } else {
                   sprite.classList.remove("icon-minus");
                   sprite.classList.add("icon-plus");
                   elem.classList.add("red-border");
+                  elem.classList.remove("green-border");
                   item.toSave = false;
-                  chrome.storage.local.set({ json });
+                  console.log("deleted");
+                  console.log(JSON.stringify(item));
+                  // chrome.storage.local.set({ [id]: json });
                 }
               });
             }

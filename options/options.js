@@ -27,128 +27,128 @@ window.onload = () => {
       addToTable(json);
     }
 
-    //Чекбокс ручна фільтрація
+    // //Чекбокс ручна фільтрація
 
-    const monkeyCheckbox = document.querySelector("#monkey_filter");
+    // const monkeyCheckbox = document.querySelector("#monkey_filter");
 
-    let isMonkeyChecked = await getStorageData("monkeyChecked");
+    // let isMonkeyChecked = await getStorageData("monkeyChecked");
 
-    if (isMonkeyChecked) {
-      monkeyCheckbox.checked = isMonkeyChecked;
-    } else {
-      monkeyCheckbox.checked = false;
-    }
+    // if (isMonkeyChecked) {
+    //   monkeyCheckbox.checked = isMonkeyChecked;
+    // } else {
+    //   monkeyCheckbox.checked = false;
+    // }
 
-    monkeyCheckbox.addEventListener("change", async () => {
-      chrome.storage.local.set({ monkeyChecked: monkeyCheckbox.checked });
-      // json = await getStorageData("json");
-      addToTable(json);
-    });
+    // monkeyCheckbox.addEventListener("change", async () => {
+    //   chrome.storage.local.set({ monkeyChecked: monkeyCheckbox.checked });
+    //   // json = await getStorageData("json");
+    //   addToTable(json);
+    // });
 
-    //Заповнення idNote
+    // //Заповнення idNote
 
-    let note = document.querySelector("#note");
-    const send = document.querySelector("#send");
-    let error = document.querySelector(".error");
+    // let note = document.querySelector("#note");
+    // const send = document.querySelector("#send");
+    // let error = document.querySelector(".error");
 
-    note.addEventListener("input", () => {
-      if (send.getAttribute("disabled")) {
-        send.removeAttribute("disabled");
-      }
-      if (
-        error.textContent == "Спочатку заповніть idNote" &&
-        !error.classList.contains("hide")
-      ) {
-        error.classList.add("hide");
-      }
-    });
+    // note.addEventListener("input", () => {
+    //   if (send.getAttribute("disabled")) {
+    //     send.removeAttribute("disabled");
+    //   }
+    //   if (
+    //     error.textContent == "Спочатку заповніть idNote" &&
+    //     !error.classList.contains("hide")
+    //   ) {
+    //     error.classList.add("hide");
+    //   }
+    // });
 
-    //Відправка данних
+    // //Відправка данних
 
-    send.addEventListener("click", async (e) => {
-      e.preventDefault();
-      let checked = await getStorageData("monkeyChecked");
-      note = document.querySelector("#note");
-      error = document.querySelector(".error");
-      json = await getStorageData("json");
+    // send.addEventListener("click", async (e) => {
+    //   e.preventDefault();
+    //   let checked = await getStorageData("monkeyChecked");
+    //   note = document.querySelector("#note");
+    //   error = document.querySelector(".error");
+    //   json = await getStorageData("json");
 
-      if (!note.value.length) {
-        error.textContent = "Спочатку заповніть idNote";
-        error.classList.remove("hide");
-        note.focus();
-        if (!send.getAttribute("disabled")) {
-          send.setAttribute("disabled", true);
-        }
-        return;
-      }
+    //   if (!note.value.length) {
+    //     error.textContent = "Спочатку заповніть idNote";
+    //     error.classList.remove("hide");
+    //     note.focus();
+    //     if (!send.getAttribute("disabled")) {
+    //       send.setAttribute("disabled", true);
+    //     }
+    //     return;
+    //   }
 
-      if (!json.length) {
-        error.textContent = "Не можна зберігати пустий результат";
-        error.classList.remove("hide");
-        if (!send.getAttribute("disabled")) {
-          send.setAttribute("disabled", true);
-        }
-        return;
-      }
+    //   if (!json.length) {
+    //     error.textContent = "Не можна зберігати пустий результат";
+    //     error.classList.remove("hide");
+    //     if (!send.getAttribute("disabled")) {
+    //       send.setAttribute("disabled", true);
+    //     }
+    //     return;
+    //   }
 
-      let data = [];
-      if (checked) {
-        data = json.filter((item) => {
-          if (item.toSave) {
-            item.idNote = note.value;
-            return item;
-          }
-        });
-      } else {
-        data = json.map((item) => {
-          item.idNote = note.value;
-          return item;
-        });
-      }
+    //   let data = [];
+    //   if (checked) {
+    //     data = json.filter((item) => {
+    //       if (item.toSave) {
+    //         item.idNote = note.value;
+    //         return item;
+    //       }
+    //     });
+    //   } else {
+    //     data = json.map((item) => {
+    //       item.idNote = note.value;
+    //       return item;
+    //     });
+    //   }
 
-      chrome.runtime.sendMessage({ json: data }, () => {});
-    });
+    //   chrome.runtime.sendMessage({ json: data }, () => {});
+    // });
 
-    //Додавання даних до таблиці
-    chrome.storage.onChanged.addListener(async (changes) => {
-      json = await getStorageData("json");
-      console.log(json);
-      addToTable(json);
-    });
+    // //Додавання даних до таблиці
+    // chrome.storage.onChanged.addListener(async (changes) => {
+    //   json = await getStorageData("json");
+    //   console.log(json);
+    //   addToTable(json);
+    // });
 
-    async function addToTable(data) {
-      const table = document.querySelector("table");
-      let checked = await getStorageData("monkeyChecked");
+    // async function addToTable(data) {
+    //   const table = document.querySelector("table");
+    //   let checked = await getStorageData("monkeyChecked");
 
-      const tableBody = document.querySelector(".table-body");
+    //   const tableBody = document.querySelector(".table-body");
 
-      if (tableBody) {
-        tableBody.remove();
-      }
+    //   if (tableBody) {
+    //     tableBody.remove();
+    //   }
 
-      const tbody = document.createElement("tbody");
+    //   const tbody = document.createElement("tbody");
 
-      tbody.classList.add("table-body");
+    //   tbody.classList.add("table-body");
 
-      data.forEach((item, i) => {
-        let row = `<tr class="table-row">
-        <th scope="row">${item.itemID}</th>
-        <td>${item.shopID}</td>
-        <td>${item.volumeOfSales}</td>
-        <td>${item.shortTitle}</td>
-        <td>${item.picUrl}</td>
-        </tr>`;
+    //   data.forEach((item, i) => {
+    //     let row = `<tr class="table-row">
+    //     <th scope="row">${item.itemID}</th>
+    //     <td>${item.shopID}</td>
+    //     <td>${item.volumeOfSales}</td>
+    //     <td>${item.shortTitle}</td>
+    //     <td>${item.picUrl}</td>
+    //     </tr>`;
 
-        if (checked) {
-          if (item.toSave) {
-            tbody.insertAdjacentHTML("afterbegin", row);
-          }
-        } else {
-          tbody.insertAdjacentHTML("afterbegin", row);
-        }
-      });
-      table.append(tbody);
-    }
+    //     if (checked) {
+    //       if (item.toSave) {
+    //         tbody.insertAdjacentHTML("afterbegin", row);
+    //       }
+    //     } else {
+    //       tbody.insertAdjacentHTML("afterbegin", row);
+    //     }
+    //   });
+    //   table.append(tbody);
+    // }
 
     //Пошук елементів в popup
     const inputRating = document.getElementById("mrg"),
