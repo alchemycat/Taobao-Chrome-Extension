@@ -1,13 +1,13 @@
 window.onload = () => {
   (async () => {
     //Отримуємо дані які зараз в storage
-    let mrg = parseInt(await getStorageData("minimalRating"));
-    let isChecked = await getStorageData("whitelistChecked");
-    let whitelist = await getStorageData("whitelist");
+    let mrg = parseInt(await getStorageData("minimalRating")); //Рейтинг
+    let isChecked = await getStorageData("whitelistChecked"); //Чекбокс вайтліст
+    let whitelist = await getStorageData("whitelist"); //Вайтліст
 
     //Додаємо глобальні зміні для збереження результату сторінки
-    let save = [];
-    let data;
+    let initialData = []; //глобальна зміна яка зберігає g_page_config до фільтрації
+    let toSaveData = []; //глобальна зміна яка зберігає дані які пройшли фільтрацію (потрібна для збереження даних)
 
     //Додаємо на сторінку спрайти
     let spriteLink = document.createElement("link");
@@ -48,8 +48,9 @@ window.onload = () => {
         if (changes.whitelistChecked) {
           isChecked = changes.whitelistChecked.newValue; //Встановлюємо нове значення
         }
-        //Якщо дані в storage змінилися нам потрібно отримати новий json з даними, щоб знову відфільтрувати все відносно нових налаштувань
-        fetchData(location.href);
+
+        //Якщо дані в storage змінилися ми використовуємо глобальну змінну з (початковими даними) для повторної фільтрації, щоб уникнути повторго запроса для отримання одних і тих самих даних
+        changeVisibility(initialData, whitelist);
       }
     });
     //--------------------------
@@ -58,18 +59,18 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       //Якщо type == DATA тоді нам прийшов новий g_page_config зі сторінки
       if (event.data.type == "DATA") {
-        data = event.data.formatted;
-        changeVisibility(data, whitelist);
+        initialData = event.data.formatted;
+        changeVisibility(initialData, whitelist);
       }
       //Якщо type == "SAVE" це значить що хоткеї для збереження даних були нажаті і в нас є idNote, далі потрібно відправляти дані в таблицю
       if (event.data.type == "SAVE") {
-        if (!save.length) {
+        if (!toSaveData.length) {
           createAlert("Ви ще не зібрали дані які можна зберігати", "failure");
           return;
         }
 
         //Фільтруємо масив перед збереженням в таблицю і встановлюємо idNote для елементів
-        let prepared = save.filter((item) => {
+        let preparedData = toSaveData.filter((item) => {
           if (item.toSave) {
             item.idNote = event.data.idNote;
             return item;
@@ -77,12 +78,12 @@ window.onload = () => {
         });
 
         //Проста валідація чи є в массиві потрібні дані
-        if (!prepared.length) {
+        if (!preparedData.length) {
           createAlert("Ви ще не зібрали дані які можна зберігати", "failure");
           return;
         }
         //Відправляємо дані до background
-        chrome.runtime.sendMessage({ type: "SAVE_DATA", json: prepared });
+        chrome.runtime.sendMessage({ type: "SAVE_DATA", json: preparedData });
       }
     });
     //--------------------------
@@ -92,8 +93,8 @@ window.onload = () => {
       if (response.type == "URL_CHANGED") {
         //Це потрібно тому що сторінка на оновлюється і нам потрібно додаткове сповіщення яке перевіряє чи location.href змінився
         //Якщо нова сторінка то задаємо нове значення для глобальних змінних
-        save = [];
-        data = [];
+        toSaveData = [];
+        initialData = [];
 
         //Запит нових даних для нової сторінки
         fetchData(location.href);
@@ -121,6 +122,7 @@ window.onload = () => {
             .replace(/(\s|)(\p{Script=Han}+(\s|))\p{Script=Han}+(\s|)/gu, " | ")
             .replace(/(?<=(\w|\W))\p{Script=Han}+(?=(\w|\W))/gu, " | ")
             .replace(/(^(\s\|\s)|(\s\|\s)$)/g, "");
+
           if (!formattedTitle) {
             formattedTitle = `Keyword ${item.raw_title}`;
           }
@@ -174,7 +176,7 @@ window.onload = () => {
         });
       }
 
-      save = json;
+      toSaveData = json;
 
       json.forEach((item) => {
         if (!item.filter) {
@@ -220,14 +222,14 @@ window.onload = () => {
                 elem.classList.add("green-border");
                 elem.classList.remove("red-border");
                 item.toSave = true;
-                save = json;
+                toSaveData = json;
               } else {
                 sprite.classList.remove("icon-minus");
                 sprite.classList.add("icon-plus");
                 elem.classList.add("red-border");
                 elem.classList.remove("green-border");
                 item.toSave = false;
-                save = json;
+                toSaveData = json;
               }
             });
           }
