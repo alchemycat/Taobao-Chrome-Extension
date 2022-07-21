@@ -171,47 +171,50 @@ window.onload = () => {
       }
 
       toSaveData = correctData; //Записуємо відфільтровані дані в глобальну зміну (зміна потрібна для збереження даних)
+
+      showElements(correctData); //Викликаємо функцію для відображення елементів на сторінці відносно налаштувань фільтра
     }
 
     function showElements(data) {
       //Тут починається логіка відображення елементів на сторінці
+      // спочатку надаємо всім елементам display: block;
       document
         .querySelectorAll('[data-category="auctions"]')
         .forEach((item) => {
           item.style.display = "block";
-        }); // спочатку надаємо всім елементам display: block;
+        });
+      //-------------------------
 
-      json.forEach((item) => {
+      data.forEach((item) => {
+        //Перевіряємо чи елемент пройшов фільтрацію, якщо ні то ховаємо його
+        const elem = document.querySelector(
+          `div[data-index="${item.index - 1}"]`
+        );
+
         if (!item.filter) {
-          const elem = document.querySelector(
-            `div[data-index="${item.index - 1}"]`
-          );
           if (elem) {
             elem.style.display = "none"; //ховаємо елемент
           }
         } else {
-          const elem = document.querySelector(
-            `div[data-index="${item.index - 1}"]`
-          );
+          //Елемент пройшов фільтрацію, залишаємо елемент на сторінці та додаємо спрайт
           if (elem) {
-            const isExist = elem.querySelector(".sprite");
+            elem.style.position = "relative"; //Задаємо стилі для нашого елемента
 
+            //Приводимо елемент до початкового стану (сторінка могла не оновлюватись а налаштування фільтра змінитись)
+            const isExist = elem.querySelector(".sprite");
             if (isExist) {
               isExist.remove();
               elem.classList.remove("red-border");
               elem.classList.add("green-border");
             }
+            //-------------------------
+
             let sprite = document.createElement("div");
             sprite.classList.add("sprite");
             sprite.classList.add("icon-minus");
             sprite.style.backgroundImage = `url(${chrome.runtime.getURL(
               "assets/sprite/sprite.png"
             )})`;
-            sprite.style.position = "absolute";
-            sprite.style.bottom = "10px";
-            sprite.style.right = "35px";
-
-            elem.style.position = "relative";
 
             elem.classList.add("green-border");
 
@@ -220,25 +223,32 @@ window.onload = () => {
             sprite.addEventListener("click", async (e) => {
               e.stopPropagation();
               if (sprite.classList.contains("icon-plus")) {
+                //Переключаємо стилі
                 sprite.classList.remove("icon-plus");
                 sprite.classList.add("icon-minus");
+
                 elem.classList.add("green-border");
                 elem.classList.remove("red-border");
+
+                //Змінюємо параметр для фільтра
                 item.toSave = true;
-                toSaveData = json;
               } else {
+                //Переключаємо стилі
                 sprite.classList.remove("icon-minus");
                 sprite.classList.add("icon-plus");
+
                 elem.classList.add("red-border");
                 elem.classList.remove("green-border");
+
+                //Змінюємо параметр для фільтра
                 item.toSave = false;
-                toSaveData = json;
               }
+              //Змінюємо глобальну зміну
+              toSaveData = data;
             });
           }
         }
       });
     }
-    //--------------------------
   })();
 };

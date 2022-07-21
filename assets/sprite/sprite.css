@@ -1,4 +1,7 @@
 .sprite {
+  position: absolute;
+  bottom: 12px;
+  right: 35px;
   cursor: pointer;
 }
 
