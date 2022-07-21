@@ -25,6 +25,7 @@ window.onload = () => {
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes) {
       if (changes) {
+        console.log("changes");
         //Якщо змінився рейтинг
         if (changes.minimalRating) {
           minRating = parseInt(changes.minimalRating.newValue); //Встановлюємо новий рейтинг
@@ -53,6 +54,7 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       //Якщо type == DATA тоді нам прийшов новий g_page_config зі сторінки
       if (event.data.type == "DATA") {
+        console.log("data message");
         initialData = event.data.formatted; // встановлюємо актуальні дані для глобальної зміної
         filterData(initialData, whitelist);
       }
@@ -103,6 +105,7 @@ window.onload = () => {
     //Функція яка фільтрує дані
     async function filterData(data, whitelist) {
       //Спочатку достаємо тільки потрібні дані в наш новий об'єкт
+      console.log(`Income data length ${JSON.stringify(data)}`);
       let correctData = data.map((item, i) => {
         try {
           let filteredData = {};
@@ -119,7 +122,8 @@ window.onload = () => {
           }
 
           //Збираємо дані які там потрібні з g_page_config
-          filteredData.index = i + 1;
+          console.log(`Index: ${i}`);
+          filteredData.index = i;
           filteredData.itemID = item.nid;
           filteredData.shopID = item.user_id;
           filteredData.longTitle = item.raw_title;
@@ -148,8 +152,10 @@ window.onload = () => {
           item.service < minRating
         ) {
           item.filter = false;
+          item.toSave = false;
           return item;
         } else {
+          item.filter = true;
           item.toSave = true;
           return item;
         }
@@ -178,24 +184,34 @@ window.onload = () => {
     function showElements(data) {
       //Тут починається логіка відображення елементів на сторінці
       // спочатку надаємо всім елементам display: block;
-      document
-        .querySelectorAll('[data-category="auctions"]')
-        .forEach((item) => {
-          item.style.display = "block";
-        });
+      let allElems = document.querySelectorAll('[data-category="auctions"]');
+      allElems.forEach((item) => {
+        item.style.display = "block";
+      });
       //-------------------------
 
       data.forEach((item) => {
         //Перевіряємо чи елемент пройшов фільтрацію, якщо ні то ховаємо його
-        const elem = document.querySelector(
-          `div[data-index="${item.index - 1}"]`
-        );
 
         if (!item.filter) {
+          const elem = document.querySelector(
+            `div[data-index="${item.index}"]`
+          );
+          console.log(`Ховаю елемент ${item.index}`);
           if (elem) {
             elem.style.display = "none"; //ховаємо елемент
           }
         } else {
+          const elem = document.querySelector(
+            `div[data-index="${item.index}"]`
+          );
+
+          console.log(
+            `Показую елемент: ${elem.getAttribute(
+              "data-index"
+            )}\nItem:${JSON.stringify(item)}`
+          );
+
           //Елемент пройшов фільтрацію, залишаємо елемент на сторінці та додаємо спрайт
           if (elem) {
             elem.style.position = "relative"; //Задаємо стилі для нашого елемента
