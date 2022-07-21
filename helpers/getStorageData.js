@@ -1,3 +1,4 @@
+//Функція дістає дані з chrome.storage
 function getStorageData(sKey) {
   return new Promise(function (resolve, reject) {
     chrome.storage.local.get(null, function (items) {

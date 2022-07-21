@@ -1,3 +1,4 @@
+//Функція для створення сповіщень про дії користувача на сторінці
 function createAlert(text, status) {
   const alerts = document.querySelectorAll(".alert");
   alerts.forEach((item) => {

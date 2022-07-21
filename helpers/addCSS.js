@@ -1,3 +1,4 @@
+//Функція хелпер для того щоб додавати свій css на сторінку
 function addCSS(href) {
   let link = document.createElement("link");
   link.rel = "stylesheet";

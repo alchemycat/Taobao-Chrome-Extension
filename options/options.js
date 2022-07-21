@@ -1,6 +1,6 @@
 window.onload = () => {
   (async () => {
-    //Таби
+    //Таби, переключають меню
     const navlinks = document.querySelectorAll(".nav-link");
     const tabs = document.querySelectorAll(".tab-pane");
 
@@ -24,16 +24,15 @@ window.onload = () => {
     const inputRating = document.getElementById("mrg"),
       whitelist = document.getElementById("whitelist"),
       whitelistCheckbox = document.getElementById("whitelist_checkbox");
+    let isChecked = await getStorageData("whitelistChecked");
 
     //забираємо дані зі storage про мінімальний рейтинг якщо вони там вже є
     let minimalRating = await getStorageData("minimalRating");
-    console.log(minimalRating);
     if (minimalRating) {
       inputRating.value = minimalRating;
     }
 
     //забираємо дані зі storage про те чи потрібно використовувати whitelist якщо вони там вже є
-    let isChecked = await getStorageData("whitelistChecked");
 
     //якщо потрібно то активуємо textarea або додаємо disabled
     if (isChecked) {
@@ -78,62 +77,73 @@ window.onload = () => {
       chrome.storage.local.set({ whitelist: whitelist.value });
     });
 
-    //Hotkey
+    //Встановлюємо хоткеї
     const hotkey = document.getElementById("hotkey");
     const hotletter = document.getElementById("hotletter");
 
+    //отримуємо актуальні хоткеї
     let key = await getStorageData("hotkey");
     let letter = await getStorageData("hotletter");
 
     if (key) {
+      //якщо раніше вже були встановлено хоткей то показуємо значення
       hotkey.value = key;
     } else {
+      //якщо не було встановлено хоткей показуємо значення за замовченням
       hotkey.value = "Control";
     }
 
     if (letter) {
+      //якщо раніше вже були встановлено літеру то показуємо значення
       hotletter.value = letter;
     } else {
+      //якщо не було встановлено літеру показуємо значення за замовченням
       hotletter.value = "s";
     }
 
+    //Якщо користувач вводить значення для хоткею то обробляємо його
     hotkey.addEventListener("keydown", (e) => {
       e.stopPropagation();
       e.preventDefault();
-
+      //приймаємо тільки ctrl та alt
       if (e.key == "Control" || e.key == "Alt") {
         e.target.value = e.key;
-
+        //зберігаємо нове значення в chrome.storage
         chrome.storage.local.set({ hotkey: hotkey.value });
       }
     });
 
+    //Якщо користувач вводить значення для літери то обробляємо його
     hotletter.addEventListener("keydown", (e) => {
       e.stopPropagation();
       e.preventDefault();
       e.target.value = e.key;
+      //зберігаємо нове значення в chrome.storage
       chrome.storage.local.set({ hotletter: hotletter.value });
     });
 
-    //Показати опції
+    //Показуємо які таблиці доступні для користування
     async function showOptions() {
       const select = document.getElementById("select");
       const options = document.querySelectorAll("option[value]");
       let list = await getStorageData("list");
 
       try {
+        //якщо таблиць ще немає ставимо для селекту значення disabled
         if (!list || !list.length) {
           chrome.storage.local.set({ list: [] });
           select.setAttribute("disabled", true);
         }
 
         if (options) {
+          //видаляємо всі опції
           options.forEach((item) => {
             item.remove();
           });
         }
 
         list.forEach((item) => {
+          //створюємо опції на основі актуальних даних
           const option = document.createElement("option");
           option.value = item.name;
           option.textContent = item.name;
@@ -146,29 +156,38 @@ window.onload = () => {
         console.log(err);
       }
     }
-
+    //викликаємо функцію показати таблиці
     showOptions();
-    //Змінити опцію
+
+    //Якщо користувач змінює таблицю за замовченням тоді потрібно встановити нове значення для таблиці в chrome.storage
     select.addEventListener("change", async (e) => {
+      //беремо назву таблиці яку вибрав користувач
       const name = e.target.value;
+      //Достаємо таблиці з chrome.storage
       let list = await getStorageData("list");
       try {
+        //видаляємо атрибут selected з таблиці яка була обрана до цього
         document.querySelector(`option[selected]`).removeAttribute("selected");
 
+        //встановлюємо атрибут selected для нової обраної таблиці
         document
           .querySelector(`option[value="${e.target.value}"]`)
           .setAttribute("selected", true);
 
+        //в даних які отримали з chrome.storage шукаємо index таблиці по її назві
         let itemIndex = list.findIndex((elem) => elem.name == name);
 
+        //змінюємо для всіх таблиці параметр selected = false;
         if (itemIndex) {
           list = list.map((item) => {
             item.selected = false;
             return item;
           });
 
+          //знаходимо нову обрано таблицю і встановлюємо selected = true
           list[itemIndex].selected = true;
 
+          //обновляємо дані в chrome.storage
           chrome.storage.local.set({ list });
         }
       } catch (err) {
@@ -176,8 +195,7 @@ window.onload = () => {
       }
     });
 
-    //Додати таблицю
-
+    //Додати нову таблицю
     const buttonSpreadsheet = document.querySelector("#add_spreadsheet");
 
     buttonSpreadsheet.addEventListener("click", async () => {
@@ -187,15 +205,20 @@ window.onload = () => {
       const spreadsheetLink = document.getElementById("spreadsheet_link");
       const select = document.getElementById("select");
 
+      //Отримуємо список таблиці з chrome.storage
       let list = await getStorageData("list");
 
+      //Перевіряємо чи користувач ввів нову назву для таблиці
       if (!name.value) {
         name.focus();
+        //Якщо ні то нагадуємо що потрібно ввести назву
         addNotification(buttonSpreadsheet, "Додайте назву", "error");
         return;
       }
+      //Перевіряємо чи користувач ввів нове посилання для вебхука
       if (!postLink.value) {
         postLink.focus();
+        //Якщо ні то нагадуємо що потрібно ввести посилання для вебхука
         addNotification(
           buttonSpreadsheet,
           "Додайте посилання для відправки POST запиту",
@@ -203,8 +226,10 @@ window.onload = () => {
         );
         return;
       }
+      //Перевіряємо чи користувач ввів нове посилання для таблиці
       if (!spreadsheetLink.value) {
         spreadsheetLink.focus();
+        //Якщо ні то нагадуємо що потрібно ввести посилання для таблиці
         addNotification(
           buttonSpreadsheet,
           "Додайте посилання на таблицю",
@@ -213,8 +238,10 @@ window.onload = () => {
         return;
       }
 
+      //Шукаємо в списку чи є таблиця з такою назвою
       let resultIndex = list.findIndex((elem) => elem.name === name.value);
 
+      //Якщо таблиця вже є нагадуємо користувачу що потрібно ввести унікальну назву
       if (!resultIndex) {
         name.focus();
         addNotification(
@@ -224,10 +251,14 @@ window.onload = () => {
         );
         return;
       } else {
+        //у випадку якщо таблиці немає тоді додаємо її в список
+
+        //спочатку змінюємо для всіх таблиць у списку параметр selected = false
         list.forEach((item) => {
           item.selected = false;
         });
 
+        //додаємо нову таблицю і ставимо їй параметр selected = true означає що вона буде обрана за замовченням
         list.push({
           name: name.value,
           postLink: postLink.value,
@@ -235,17 +266,22 @@ window.onload = () => {
           selected: true,
         });
 
+        //після того як додали дані очищаємо інпути
         form.reset();
 
+        //якщо селект був деактивований тоді активуємо його
         select.removeAttribute("disabled");
 
+        //зберігаємо дані в chrome.storage
         chrome.storage.local.set({ list });
+        //сповіщуємо користувача що успішно додали таблицю
         addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
+        //показуємо опції вже з новою таблицею
         showOptions();
       }
     });
 
-    //notifications
+    //Це функція для створення сповіщень про дії користувача
     function addNotification(target, text, type) {
       let errors = document.querySelectorAll(".error");
       let success = document.querySelectorAll(".success");
