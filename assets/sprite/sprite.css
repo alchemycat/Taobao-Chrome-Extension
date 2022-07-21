@@ -1,3 +1,7 @@
+.sprite {
+  cursor: pointer;
+}
+
 .icon-minus {
   background-position: 0px 0px;
   width: 16px;

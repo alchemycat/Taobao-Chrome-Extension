@@ -1,26 +1,20 @@
 window.onload = () => {
   (async () => {
+    //Додаємо на сторінку спрайти
+    addCSS("assets/sprite/sprite.css");
+
+    //Додаємо на сторінку повідомлення про стан збереження в таблицю
+    addCSS("assets/alert/alert.css");
+    //--------------------------
+
     //Отримуємо дані які зараз в storage
-    let mrg = parseInt(await getStorageData("minimalRating")); //Рейтинг
+    let minRating = parseInt(await getStorageData("minimalRating")); //Рейтинг
     let isChecked = await getStorageData("whitelistChecked"); //Чекбокс вайтліст
     let whitelist = await getStorageData("whitelist"); //Вайтліст
 
     //Додаємо глобальні зміні для збереження результату сторінки
     let initialData = []; //глобальна зміна яка зберігає g_page_config до фільтрації
     let toSaveData = []; //глобальна зміна яка зберігає дані які пройшли фільтрацію (потрібна для збереження даних)
-
-    //Додаємо на сторінку спрайти
-    let spriteLink = document.createElement("link");
-    spriteLink.rel = "stylesheet";
-    spriteLink.href = chrome.runtime.getURL("assets/sprite/sprite.css");
-    document.querySelector("head").append(spriteLink);
-
-    //Додаємо на сторінку повідомлення про стан збереження в таблицю
-    let alertLink = document.createElement("link");
-    alertLink.rel = "stylesheet";
-    alertLink.href = chrome.runtime.getURL("assets/alert/alert.css");
-    document.querySelector("head").append(alertLink);
-    //--------------------------
 
     //Робимо запит на taobao щоб отримати дані для цієї сторінки
     fetchData(location.href);
@@ -33,11 +27,11 @@ window.onload = () => {
       if (changes) {
         //Якщо змінився рейтинг
         if (changes.minimalRating) {
-          mrg = parseInt(changes.minimalRating.newValue); //Встановлюємо новий рейтинг
+          minRating = parseInt(changes.minimalRating.newValue); //Встановлюємо новий рейтинг
 
-          if (isNaN(mrg)) {
+          if (isNaN(minRating)) {
             //Якщо в рейтинг додано некорректне значення встановлюємо 0
-            mrg = 0;
+            minRating = 0;
           }
         }
         //Якщо є зміни у вайтлисті
@@ -50,7 +44,7 @@ window.onload = () => {
         }
 
         //Якщо дані в storage змінилися ми використовуємо глобальну змінну з (початковими даними) для повторної фільтрації, щоб уникнути повторго запроса для отримання одних і тих самих даних
-        changeVisibility(initialData, whitelist);
+        filterData(initialData, whitelist);
       }
     });
     //--------------------------
@@ -59,8 +53,8 @@ window.onload = () => {
     window.addEventListener("message", async (event) => {
       //Якщо type == DATA тоді нам прийшов новий g_page_config зі сторінки
       if (event.data.type == "DATA") {
-        initialData = event.data.formatted;
-        changeVisibility(initialData, whitelist);
+        initialData = event.data.formatted; // встановлюємо актуальні дані для глобальної зміної
+        filterData(initialData, whitelist);
       }
       //Якщо type == "SAVE" це значить що хоткеї для збереження даних були нажаті і в нас є idNote, далі потрібно відправляти дані в таблицю
       if (event.data.type == "SAVE") {
@@ -106,53 +100,52 @@ window.onload = () => {
       }
     });
 
-    //Функція яка ховає та показує елементи
-    async function changeVisibility(data, whitelist) {
-      let json = [];
-      document
-        .querySelectorAll('[data-category="auctions"]')
-        .forEach((item) => {
-          item.style.display = "block";
-        }); // спочатку надаємо всім елементам display: block;
-      data.forEach((item, i) => {
+    //Функція яка фільтрує дані
+    async function filterData(data, whitelist) {
+      //Спочатку достаємо тільки потрібні дані в наш новий об'єкт
+      let correctData = data.map((item, i) => {
         try {
-          let newJson = {};
+          let filteredData = {};
 
+          //Регулярка яка фільтрує тайтл
           let formattedTitle = item.raw_title
             .replace(/(\s|)(\p{Script=Han}+(\s|))\p{Script=Han}+(\s|)/gu, " | ")
             .replace(/(?<=(\w|\W))\p{Script=Han}+(?=(\w|\W))/gu, " | ")
             .replace(/(^(\s\|\s)|(\s\|\s)$)/g, "");
 
+          //Якщо тайтл не підлягає фільтрації просто записуємо стандартний Keyword + стандартний тайтл
           if (!formattedTitle) {
             formattedTitle = `Keyword ${item.raw_title}`;
           }
 
-          newJson.index = i + 1;
-          newJson.itemID = item.nid;
-          newJson.shopID = item.user_id;
-          newJson.longTitle = item.raw_title;
-          newJson.shortTitle = formattedTitle;
-          newJson.volumeOfSales = item.view_sales;
-          newJson.picUrl = item.pic_url;
-          newJson.delivery = item.shopcard.delivery[0] || 0;
-          newJson.description = item.shopcard.description[0] || 0;
-          newJson.service = item.shopcard.service[0] || 0;
-          newJson.filter = true;
-          newJson.toSave = false;
-          newJson.idNote = "";
-          newJson.url = `https://item.taobao.com/item.htm?id=${item.nid}`;
+          //Збираємо дані які там потрібні з g_page_config
+          filteredData.index = i + 1;
+          filteredData.itemID = item.nid;
+          filteredData.shopID = item.user_id;
+          filteredData.longTitle = item.raw_title;
+          filteredData.shortTitle = formattedTitle;
+          filteredData.volumeOfSales = item.view_sales;
+          filteredData.picUrl = item.pic_url;
+          filteredData.delivery = item.shopcard.delivery[0] || 0;
+          filteredData.description = item.shopcard.description[0] || 0;
+          filteredData.service = item.shopcard.service[0] || 0;
+          filteredData.filter = true;
+          filteredData.toSave = false;
+          filteredData.idNote = "";
+          filteredData.url = `https://item.taobao.com/item.htm?id=${item.nid}`;
 
-          json.push(newJson);
+          return filterData; //Повертаємо в новий массив зібрані дані
         } catch (err) {
           console.log(err);
         }
       });
 
-      json = json.map((item, i) => {
+      //Фільтр по рейтингу
+      correctData = correctData.map((item, i) => {
         if (
-          item.delivery < mrg ||
-          item.description < mrg ||
-          item.service < mrg
+          item.delivery < minRating ||
+          item.description < minRating ||
+          item.service < minRating
         ) {
           item.filter = false;
           return item;
@@ -162,10 +155,11 @@ window.onload = () => {
         }
       });
 
+      //Фільтр по вайтлісту
       if (isChecked) {
         let wl = whitelist.split("\n");
 
-        json = json.map((item) => {
+        correctData = correctData.map((item) => {
           if (item.filter) {
             if (!wl.includes(item.shopID)) {
               item.filter = false;
@@ -176,7 +170,16 @@ window.onload = () => {
         });
       }
 
-      toSaveData = json;
+      toSaveData = correctData; //Записуємо відфільтровані дані в глобальну зміну (зміна потрібна для збереження даних)
+    }
+
+    function showElements(data) {
+      //Тут починається логіка відображення елементів на сторінці
+      document
+        .querySelectorAll('[data-category="auctions"]')
+        .forEach((item) => {
+          item.style.display = "block";
+        }); // спочатку надаємо всім елементам display: block;
 
       json.forEach((item) => {
         if (!item.filter) {
