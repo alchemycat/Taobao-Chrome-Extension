@@ -23,7 +23,7 @@ window.onload = () => {
     chrome.runtime.sendMessage({ type: "INJECT" });
 
     //чекаємо оновлення данних які знаходяться в storage
-    chrome.storage.onChanged.addListener(async function (changes, namespace) {
+    chrome.storage.onChanged.addListener(async function (changes) {
       if (changes) {
         //Якщо змінився рейтинг
         if (changes.minimalRating) {
@@ -87,8 +87,8 @@ window.onload = () => {
       if (response.type == "URL_CHANGED") {
         //Це потрібно тому що сторінка на оновлюється і нам потрібно додаткове сповіщення яке перевіряє чи location.href змінився
         //Якщо нова сторінка то задаємо нове значення для глобальних змінних
-        toSaveData = [];
-        initialData = [];
+        // toSaveData = [];
+        // initialData = [];
 
         //Запит нових даних для нової сторінки
         fetchData(location.href);
@@ -134,7 +134,7 @@ window.onload = () => {
           filteredData.idNote = "";
           filteredData.url = `https://item.taobao.com/item.htm?id=${item.nid}`;
 
-          return filterData; //Повертаємо в новий массив зібрані дані
+          return filteredData; //Повертаємо в новий массив зібрані дані
         } catch (err) {
           console.log(err);
         }
