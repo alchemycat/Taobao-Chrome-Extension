@@ -1,9 +1,4 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log("installed");
-});
-
 chrome.action.onClicked.addListener(function (tab) {
-  console.log("icon clicked");
   chrome.tabs.create({
     url: "options/options.html",
   });
@@ -11,7 +6,6 @@ chrome.action.onClicked.addListener(function (tab) {
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (/taobao\.com\/search/.test(changeInfo.url)) {
-    // console.log("URL CHANGED");
     chrome.tabs.sendMessage(tabId, { type: "URL_CHANGED" });
   }
 });
@@ -33,7 +27,19 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       },
       body: JSON.stringify({ url: spreadsheetLink, body: request.json }),
     }).then((response) => {
-      console.log(response);
+      if (response.status === 200) {
+        chrome.tabs.sendMessage(sender.tab.id, {
+          type: "DELIVERY",
+          message: "Дані збережено успішно",
+          status: "success",
+        });
+      } else {
+        chrome.tabs.sendMessage(sender.tab.id, {
+          type: "DELIVERY",
+          message: "Дані не збережено. Перевірте таблицю та вебхук",
+          status: "failure",
+        });
+      }
     });
   }
   if (request.type == "INJECT") {
@@ -69,6 +75,9 @@ function handleKeys(hotletter, hotkey) {
       if (e.key === hotletter && button) {
         e.preventDefault();
         let idNote = await prompt("Задайте idNote: ");
+        if (!idNote) {
+          return;
+        }
         window.postMessage(
           {
             type: "SAVE",

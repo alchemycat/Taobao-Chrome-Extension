@@ -5,63 +5,103 @@ window.onload = () => {
     let isChecked = await getStorageData("whitelistChecked");
     let whitelist = await getStorageData("whitelist");
 
+    //Додаємо глобальні зміні для збереження результату сторінки
     let save = [];
     let data;
 
-    //--------------------------
-    let css = document.createElement("link");
-    css.rel = "stylesheet";
-    css.href = chrome.runtime.getURL("assets/sprite/sprite.css");
-    document.querySelector("head").append(css);
+    //Додаємо на сторінку спрайти
+    let spriteLink = document.createElement("link");
+    spriteLink.rel = "stylesheet";
+    spriteLink.href = chrome.runtime.getURL("assets/sprite/sprite.css");
+    document.querySelector("head").append(spriteLink);
+
+    //Додаємо на сторінку повідомлення про стан збереження в таблицю
+    let alertLink = document.createElement("link");
+    alertLink.rel = "stylesheet";
+    alertLink.href = chrome.runtime.getURL("assets/alert/alert.css");
+    document.querySelector("head").append(alertLink);
     //--------------------------
 
+    //Робимо запит на taobao щоб отримати дані для цієї сторінки
     fetchData(location.href);
 
+    //Відправляємо повідомлення у background, яке ініціює додавання хоткеїв для збереження даних в таблицю на сторінку
     chrome.runtime.sendMessage({ type: "INJECT" });
 
     //чекаємо оновлення данних які знаходяться в storage
     chrome.storage.onChanged.addListener(async function (changes, namespace) {
       if (changes) {
+        //Якщо змінився рейтинг
         if (changes.minimalRating) {
-          mrg = parseInt(changes.minimalRating.newValue);
+          mrg = parseInt(changes.minimalRating.newValue); //Встановлюємо новий рейтинг
+
+          if (isNaN(mrg)) {
+            //Якщо в рейтинг додано некорректне значення встановлюємо 0
+            mrg = 0;
+          }
         }
+        //Якщо є зміни у вайтлисті
         if (changes.whitelist) {
-          whitelist = changes.whitelist.newValue;
+          whitelist = changes.whitelist.newValue; //Встановлюємо нові дані до вайтліста
         }
+        //Якщо чекбокс використання вайтліста включився/виклювся
         if (changes.whitelistChecked) {
-          isChecked = changes.whitelistChecked.newValue;
+          isChecked = changes.whitelistChecked.newValue; //Встановлюємо нове значення
         }
-        if (isNaN(mrg)) {
-          mrg = 0;
-        }
-        changeVisibility(data, whitelist);
+        //Якщо дані в storage змінилися нам потрібно отримати новий json з даними, щоб знову відфільтрувати все відносно нових налаштувань
+        fetchData(location.href);
       }
     });
     //--------------------------
 
-    //слухаємо дані які повинні дійти зі сторінки
+    //Тут ми чекаємо дані які приходять з скриптів які ми додали в контекст сторінки
     window.addEventListener("message", async (event) => {
+      //Якщо type == DATA тоді нам прийшов новий g_page_config зі сторінки
       if (event.data.type == "DATA") {
         data = event.data.formatted;
         changeVisibility(data, whitelist);
       }
-
+      //Якщо type == "SAVE" це значить що хоткеї для збереження даних були нажаті і в нас є idNote, далі потрібно відправляти дані в таблицю
       if (event.data.type == "SAVE") {
+        if (!save.length) {
+          createAlert("Ви ще не зібрали дані які можна зберігати", "failure");
+          return;
+        }
+
+        //Фільтруємо масив перед збереженням в таблицю і встановлюємо idNote для елементів
         let prepared = save.filter((item) => {
           if (item.toSave) {
             item.idNote = event.data.idNote;
             return item;
           }
         });
+
+        //Проста валідація чи є в массиві потрібні дані
+        if (!prepared.length) {
+          createAlert("Ви ще не зібрали дані які можна зберігати", "failure");
+          return;
+        }
+        //Відправляємо дані до background
         chrome.runtime.sendMessage({ type: "SAVE_DATA", json: prepared });
       }
     });
     //--------------------------
 
-    chrome.runtime.onMessage.addListener(async (response, sendResponse) => {
+    chrome.runtime.onMessage.addListener(async (response) => {
+      //Тут чекаємо на повідомлення чи змінилась сторінка
       if (response.type == "URL_CHANGED") {
+        //Це потрібно тому що сторінка на оновлюється і нам потрібно додаткове сповіщення яке перевіряє чи location.href змінився
+        //Якщо нова сторінка то задаємо нове значення для глобальних змінних
         save = [];
+        data = [];
+
+        //Запит нових даних для нової сторінки
         fetchData(location.href);
+      }
+
+      //Тут нам приходить сповіщення про статус збереження даних в таблицю
+      if (response.type == "DELIVERY") {
+        createAlert(response.message, response.status); //Додаємо на сторінку повідомлення про статус збереження даних
       }
     });
 
