@@ -172,6 +172,7 @@ window.onload = () => {
     showOptions();
 
     //Якщо користувач змінює таблицю за замовченням тоді потрібно встановити нове значення для таблиці в chrome.storage
+
     select.addEventListener("change", async (e) => {
       //беремо назву таблиці яку вибрав користувач
       const name = e.target.value;
@@ -208,9 +209,12 @@ window.onload = () => {
     });
 
     //Додати нову таблицю
+
     const buttonSpreadsheet = document.querySelector("#add_spreadsheet");
 
-    buttonSpreadsheet.addEventListener("click", async () => {
+    buttonSpreadsheet.addEventListener("click", addSpreadsheet);
+
+    async function addSpreadsheet() {
       const form = document.getElementById("create_spreadsheet");
       const name = document.getElementById("name");
       const postLink = document.getElementById("post_link");
@@ -293,9 +297,10 @@ window.onload = () => {
         //показуємо опції вже з новою таблицею
         showOptions();
       }
-    });
+    }
 
     //Видалення таблиць
+
     const deleteButton = document.getElementById("delete");
 
     deleteButton.addEventListener("click", deleteSpreadsheet);
