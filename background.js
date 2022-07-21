@@ -1,39 +1,48 @@
-chrome.action.onClicked.addListener(function (tab) {
+//Якщо клік на іконку додатку то показуємо сторінку options.html
+chrome.action.onClicked.addListener(function () {
   chrome.tabs.create({
     url: "options/options.html",
   });
 });
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+//Якщо сторінка змінилась тоді відправляємо меседж до content.js що сторінка змінилась
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
   if (/taobao\.com\/search/.test(changeInfo.url)) {
     chrome.tabs.sendMessage(tabId, { type: "URL_CHANGED" });
   }
 });
 
+//Слідкуємо за меседжами які приходять від content.js
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  //Якщо реквест == SAVE_DATA то потрібно зберегти дані в таблицю
   if (request.type == "SAVE_DATA") {
+    //Достаємо всі таблиці які додані із chrome.storage
     const spreadsheetList = await getStorageData("list");
 
+    //Далі шукаємо індекс таблиці яка має selected = true що означає вона зараз використовується за замовченням
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
-
+    //Обираємо цю таблицю
     const item = spreadsheetList[itemIndex];
-
+    //Достаємо з неї дані про webhook та посилання на саму таблицю
     const { spreadsheetLink, postLink } = item;
 
+    //Робимо запит по даним які дістали
     fetch(postLink, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: spreadsheetLink, body: request.json }),
+      body: JSON.stringify({ url: spreadsheetLink, body: request.json }), //В реквесті передаємо лінк на таблицю та json
     }).then((response) => {
       if (response.status === 200) {
+        //Якщо статус код запиту 200 то відправляємо меседж до content.js що все ок і дані збережені
         chrome.tabs.sendMessage(sender.tab.id, {
           type: "DELIVERY",
           message: "Дані збережено успішно",
           status: "success",
         });
       } else {
+        //Якщо статус код запиту не 200 то відправляємо меседж до content.js що дані не збережено
         chrome.tabs.sendMessage(sender.tab.id, {
           type: "DELIVERY",
           message: "Дані не збережено. Перевірте таблицю та вебхук",
@@ -42,10 +51,13 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       }
     });
   }
+  //Якщо реквест == INJECT тоді нам потрібно додати хоткеї до сторінки
   if (request.type == "INJECT") {
+    //Спочатку беремо хоткеї зі chrome.storage
     const hotletter = await getStorageData("hotletter");
     const hotkey = await getStorageData("hotkey");
 
+    //Далі виконуємо скрипт який додасть наші хоткеї до сторінки
     chrome.scripting.executeScript({
       target: {
         tabId: sender.tab.id,
@@ -55,7 +67,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     });
   }
 });
-
+//Це сам скрипт який ми додаємо на сторінку
 function handleKeys(hotletter, hotkey) {
   document.addEventListener(
     "keydown",
@@ -90,7 +102,7 @@ function handleKeys(hotletter, hotkey) {
     false
   );
 }
-
+//Функція для того щоб продати дані з chrome.storage
 function getStorageData(sKey) {
   return new Promise(function (resolve, reject) {
     chrome.storage.local.get(sKey, function (items) {
