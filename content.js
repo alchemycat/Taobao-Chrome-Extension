@@ -182,22 +182,23 @@ window.onload = () => {
       let allElems = document.querySelectorAll('[data-category="auctions"]');
 
       allElems.forEach((item) => {
-        item.style.display = "block";
+        item.style.display = "none";
       });
       //-------------------------
 
       data.forEach((item) => {
         //Перевіряємо чи елемент пройшов фільтрацію, якщо ні то ховаємо його
+        if (item.filter) {
+          let elem;
 
-        if (!item.filter) {
-          const elem = document.querySelector(`[trace-nid="${item.itemID}"]`)
-            .parentElement.parentElement.parentElement.parentElement;
-          if (elem) {
-            elem.style.display = "none"; //ховаємо елемент
+          try {
+            elem = document.querySelector(`a[trace-nid="${item.itemID}"]`)
+              .parentElement.parentElement.parentElement.parentElement;
+          } catch (err) {
+            console.log(`error filter: ${err}`);
+            elem = document.querySelector(`[data-index="${item.index}"]`);
           }
-        } else {
-          const elem = document.querySelector(`[trace-nid="${item.itemID}"]`)
-            .parentElement.parentElement.parentElement.parentElement;
+          elem.style.display = "block"; //ховаємо елемент
 
           //Елемент пройшов фільтрацію, залишаємо елемент на сторінці та додаємо спрайт
           if (elem) {
