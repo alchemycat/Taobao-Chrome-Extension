@@ -1,6 +1,7 @@
 window.onload = () => {
   (async () => {
-    //Таби, переключають меню
+    chrome.storage.local.set({ list: [] });
+    //Таби, змінюють меню
     const navlinks = document.querySelectorAll(".nav-link");
     const tabs = document.querySelectorAll(".tab-pane");
 
@@ -125,6 +126,7 @@ window.onload = () => {
     //Показуємо які таблиці доступні для користування
     async function showOptions() {
       const select = document.getElementById("select");
+      const deleteButton = document.getElementById("delete");
       const options = document.querySelectorAll("option[value]");
       let list = await getStorageData("list");
 
@@ -133,6 +135,7 @@ window.onload = () => {
         if (!list || !list.length) {
           chrome.storage.local.set({ list: [] });
           select.setAttribute("disabled", true);
+          deleteButton.setAttribute("disabled", true);
         }
 
         if (options) {
@@ -140,6 +143,15 @@ window.onload = () => {
           options.forEach((item) => {
             item.remove();
           });
+        }
+
+        //Якщо в списку немає атрибута селектед тоді встановлюємо його для останнього елемента
+        if (list.length) {
+          const itemIndex = list.findIndex((elem) => elem.selected);
+          if (itemIndex === -1) {
+            list[list.length - 1].selected = true;
+            chrome.storage.local.set({ list });
+          }
         }
 
         list.forEach((item) => {
@@ -204,6 +216,7 @@ window.onload = () => {
       const postLink = document.getElementById("post_link");
       const spreadsheetLink = document.getElementById("spreadsheet_link");
       const select = document.getElementById("select");
+      const deleteButton = document.getElementById("delete");
 
       //Отримуємо список таблиці з chrome.storage
       let list = await getStorageData("list");
@@ -271,6 +284,7 @@ window.onload = () => {
 
         //якщо селект був деактивований тоді активуємо його
         select.removeAttribute("disabled");
+        deleteButton.removeAttribute("disabled");
 
         //зберігаємо дані в chrome.storage
         chrome.storage.local.set({ list });
@@ -280,6 +294,25 @@ window.onload = () => {
         showOptions();
       }
     });
+
+    //Видалення таблиць
+    const deleteButton = document.getElementById("delete");
+
+    deleteButton.addEventListener("click", deleteSpreadsheet);
+
+    async function deleteSpreadsheet() {
+      //Отримуємо список таблиці з chrome.storage
+      let list = await getStorageData("list");
+      let name = document.querySelector("option[selected=true]").value;
+      const itemIndex = list.findIndex((elem) => elem.name == name);
+
+      //Видаляємо елемент з списку
+      list.splice(itemIndex, 1);
+      //зберігаємо дані в chrome.storage
+      chrome.storage.local.set({ list });
+      //показуємо опції вже з новою таблицею
+      showOptions();
+    }
 
     //Це функція для створення сповіщень про дії користувача
     function addNotification(target, text, type) {

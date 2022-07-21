@@ -96,6 +96,7 @@
                 <h2 class="settings__header">Налаштування таблиць</h2>
                 <hr />
                 <div class="row mb-3">
+                  <h3>Вибір таблиці</h3>
                   <div class="col">
                     <select
                       class="form-select"
@@ -104,7 +105,16 @@
                     ></select>
                   </div>
                   <div class="col">
-                    <div class="input-group mb-3">
+                    <button type="button" class="btn btn-danger" id="delete">
+                      Видалити поточну таблицю
+                    </button>
+                  </div>
+                </div>
+                <hr />
+                <div class="row mb-3">
+                  <h3>Встановлення хоткеїв</h3>
+                  <div class="col">
+                    <div class="input-group">
                       <span class="input-group-text" id="basic-addon"
                         >Клавіша:</span
                       >
@@ -117,7 +127,7 @@
                     </div>
                   </div>
                   <div class="col">
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                       <span class="input-group-text" id="basic-addon0"
                         >Літера:</span
                       >
@@ -130,7 +140,9 @@
                     </div>
                   </div>
                 </div>
+                <hr />
                 <form id="create_spreadsheet">
+                  <h3>Додати новую таблицю</h3>
                   <div
                     class="row d-flex align-items-center justify-content-center"
                   >

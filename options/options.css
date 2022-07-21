@@ -26,9 +26,12 @@
 .error {
   color: red;
   font-size: 15px;
-  /* margin-left: 15px; */
 }
 
 .hide {
   display: none;
+}
+
+h3 {
+  font-size: 17px;
 }
