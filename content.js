@@ -178,7 +178,7 @@ window.onload = () => {
 
     function showElements(data) {
       //Тут починається логіка відображення елементів на сторінці
-      // спочатку надаємо всім елементам display: block;
+      // спочатку надаємо всім елементам display: none;
       let allElems = document.querySelectorAll('[data-category="auctions"]');
 
       allElems.forEach((item) => {
@@ -187,7 +187,7 @@ window.onload = () => {
       //-------------------------
 
       data.forEach((item) => {
-        //Перевіряємо чи елемент пройшов фільтрацію, якщо ні то ховаємо його
+        //Перевіряємо чи елемент пройшов фільтрацію, якщо так то показуємо його
         if (item.filter) {
           let elem;
 
@@ -195,10 +195,9 @@ window.onload = () => {
             elem = document.querySelector(`a[trace-nid="${item.itemID}"]`)
               .parentElement.parentElement.parentElement.parentElement;
           } catch (err) {
-            console.log(`error filter: ${err}`);
             elem = document.querySelector(`[data-index="${item.index}"]`);
           }
-          elem.style.display = "block"; //ховаємо елемент
+          elem.style.display = "block"; //показуємо елемент
 
           //Елемент пройшов фільтрацію, залишаємо елемент на сторінці та додаємо спрайт
           if (elem) {
@@ -213,6 +212,7 @@ window.onload = () => {
             }
             //-------------------------
 
+            //створюємо спрайт
             let sprite = document.createElement("div");
             sprite.classList.add("sprite");
             sprite.classList.add("icon-minus");
