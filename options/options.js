@@ -1,6 +1,5 @@
 window.onload = () => {
   (async () => {
-    chrome.storage.local.set({ list: [] });
     //Таби, змінюють меню
     const navlinks = document.querySelectorAll(".nav-link");
     const tabs = document.querySelectorAll(".tab-pane");
