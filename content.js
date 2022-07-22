@@ -66,7 +66,11 @@ window.onload = () => {
           return;
         }
         //Відправляємо дані до background
-        chrome.runtime.sendMessage({ type: "SAVE_DATA", json: preparedData });
+        chrome.runtime.sendMessage({
+          type: "SAVE_DATA",
+          json: preparedData,
+          list: "filterList",
+        });
       }
     });
     //--------------------------

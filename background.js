@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   //Якщо реквест == SAVE_DATA то потрібно зберегти дані в таблицю
   if (request.type == "SAVE_DATA") {
     //Достаємо всі таблиці які додані із chrome.storage
-    const spreadsheetList = await getStorageData("list");
+    const spreadsheetList = await getStorageData(request.list);
 
     //Далі шукаємо індекс таблиці яка має selected = true що означає вона зараз використовується за замовченням
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
