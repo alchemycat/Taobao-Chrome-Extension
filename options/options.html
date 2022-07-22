@@ -98,12 +98,17 @@
                   <h3>Вибір таблиці (Ручна фільтрація)</h3>
                   <div class="col">
                     <select
-                      class="form-select filter-select"
+                      class="form-select"
                       aria-label="select"
+                      data-select="filterList"
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button" class="btn btn-danger filter-delete">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      data-delete="filterList"
+                    >
                       Видалити таблицю
                     </button>
                   </div>
@@ -112,12 +117,17 @@
                   <h3>Вибір таблиці (Парсинг)</h3>
                   <div class="col">
                     <select
-                      class="form-select scrape-select"
+                      class="form-select"
                       aria-label="select"
+                      data-select="scrapeList"
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button" class="btn btn-danger scrape-delete">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      data-delete="scrapeList"
+                    >
                       Видалити таблицю
                     </button>
                   </div>

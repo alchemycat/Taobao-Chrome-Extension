@@ -1,38 +1,37 @@
 function spreadsheet(
   formSelector,
-  selectSelector,
   addButtonSelector,
   nameInputSelector,
   webhookInputSelector,
   spreadsheetInputSelector,
-  deleteButtonSelector,
-  storageKey
+  storageKeys
 ) {
   const form = document.querySelector(formSelector),
-    select = document.querySelector(selectSelector),
-    addButton = document.querySelector(addButtonSelector),
-    name = document.querySelector(nameInputSelector),
-    webhookLink = document.querySelector(webhookInputSelector),
-    spreadsheetLink = document.querySelector(spreadsheetInputSelector),
-    deleteButton = document.querySelector(deleteButtonSelector);
-  //Функція яка додає нову таблицю в chrome storage
+    addButton = document.querySelector(addButtonSelector);
+
   async function addSpreadsheet(
     form,
-    select,
     addButton,
-    name,
-    webhookLink,
-    spreadsheetLink,
-    deleteButton
+    nameInputSelector,
+    webhookInputSelector,
+    spreadsheetInputSelector
   ) {
     addButton.addEventListener("click", async () => {
-      radios = document.querySelectorAll('[name="spreadsheet_type"]');
+      const name = document.querySelector(nameInputSelector),
+        webhookLink = document.querySelector(webhookInputSelector),
+        spreadsheetLink = document.querySelector(spreadsheetInputSelector),
+        radios = document.querySelectorAll('[name="spreadsheet_type"]');
+
       let key;
+
       radios.forEach((radio) => {
         if (radio.checked) {
           key = radio.id;
         }
       });
+
+      const deleteButton = document.querySelector(`[data-delete="${key}"]`);
+      const select = document.querySelector(`[data-select="${key}"]`);
 
       //Отримуємо список таблиці з chrome.storage
       let list = await getStorageData([key]);
@@ -103,123 +102,134 @@ function spreadsheet(
         //сповіщуємо користувача що успішно додали таблицю
         addNotification(addButton, "Таблиця успішно додана", "success");
         //показуємо опції вже з новою таблицею
-        showSpreadsheet(select, deleteButton, key);
+        showSpreadsheet(storageKeys);
       }
     });
   }
 
-  function changeSpreadsheet(select, storageKey) {
-    select.addEventListener("change", async (e) => {
-      //беремо назву таблиці яку вибрав користувач
-      const name = e.target.value;
-      //Достаємо таблиці з chrome.storage
-      let list = await getStorageData(storageKey);
-      try {
-        //видаляємо атрибут selected з таблиці яка була обрана до цього
-        select.querySelector(`option[selected]`).removeAttribute("selected");
+  function changeSpreadsheet(keys) {
+    keys.forEach((key) => {
+      const select = document.querySelector(`[data-select="${key}"]`);
 
-        //встановлюємо атрибут selected для нової обраної таблиці
-        select
-          .querySelector(`option[value="${e.target.value}"]`)
-          .setAttribute("selected", true);
+      select.addEventListener("change", async (e) => {
+        //беремо назву таблиці яку вибрав користувач
+        const name = e.target.value;
+        //Достаємо таблиці з chrome.storage
+        let list = await getStorageData(key);
+        try {
+          //видаляємо атрибут selected з таблиці яка була обрана до цього
+          select.querySelector(`option[selected]`).removeAttribute("selected");
 
-        //в даних які отримали з chrome.storage шукаємо index таблиці по її назві
-        let itemIndex = list.findIndex((elem) => elem.name == name);
+          //встановлюємо атрибут selected для нової обраної таблиці
+          select
+            .querySelector(`option[value="${e.target.value}"]`)
+            .setAttribute("selected", true);
 
-        //змінюємо для всіх таблиці параметр selected = false;
-        if (itemIndex) {
-          list = list.map((item) => {
-            item.selected = false;
-            return item;
-          });
+          //в даних які отримали з chrome.storage шукаємо index таблиці по її назві
+          let itemIndex = list.findIndex((elem) => elem.name == name);
 
-          //знаходимо нову обрано таблицю і встановлюємо selected = true
-          list[itemIndex].selected = true;
+          //змінюємо для всіх таблиці параметр selected = false;
+          if (itemIndex) {
+            list = list.map((item) => {
+              item.selected = false;
+              return item;
+            });
 
-          //обновляємо дані в chrome.storage
-          chrome.storage.local.set({ [storageKey]: list });
+            //знаходимо нову обрано таблицю і встановлюємо selected = true
+            list[itemIndex].selected = true;
+
+            //обновляємо дані в chrome.storage
+            chrome.storage.local.set({ [key]: list });
+          }
+        } catch (err) {
+          console.log(err);
         }
+      });
+    });
+  }
+
+  async function deleteSpreadsheet(keys) {
+    keys.forEach((key) => {
+      const deleteButton = document.querySelector(`[data-delete="${key}"]`);
+      const select = document.querySelector(`[data-select="${key}"]`);
+
+      deleteButton.addEventListener("click", async () => {
+        //Отримуємо список таблиці з chrome.storage
+        let list = await getStorageData(key);
+        let name = select.querySelector("option[selected=true]").value;
+        const itemIndex = list.findIndex((elem) => elem.name == name);
+
+        //Видаляємо елемент з списку
+        list.splice(itemIndex, 1);
+        //зберігаємо дані в chrome.storage
+        chrome.storage.local.set({ [key]: list });
+        //показуємо опції вже з новою таблицею
+        showSpreadsheet(storageKeys);
+      });
+    });
+  }
+
+  function showSpreadsheet(keys) {
+    keys.forEach(async (key) => {
+      const select = document.querySelector(`[data-select="${key}"]`);
+      const deleteButton = document.querySelector(`[data-delete="${key}"]`);
+      const options = select.querySelectorAll("option[value]");
+      let list = await getStorageData(key);
+
+      try {
+        //якщо таблиць ще немає ставимо для селекту значення disabled
+        if (!list || !list.length) {
+          chrome.storage.local.set({ [key]: [] });
+          list = [];
+          select.setAttribute("disabled", true);
+          deleteButton.setAttribute("disabled", true);
+        }
+
+        if (options) {
+          //видаляємо всі опції
+          options.forEach((item) => {
+            item.remove();
+          });
+        }
+
+        //Якщо в списку немає атрибута селектед тоді встановлюємо його для останнього елемента
+        if (list.length) {
+          const itemIndex = list.findIndex((elem) => elem.selected);
+          if (itemIndex === -1) {
+            list[list.length - 1].selected = true;
+            chrome.storage.local.set({ [key]: list });
+          }
+        }
+
+        list.forEach((item) => {
+          //створюємо опції на основі актуальних даних
+          const option = document.createElement("option");
+          option.value = item.name;
+          option.textContent = item.name;
+          if (item.selected) {
+            option.setAttribute("selected", true);
+          }
+          select.append(option);
+        });
       } catch (err) {
         console.log(err);
       }
     });
   }
 
-  async function deleteSpreadsheet(select, deleteButton, storageKey) {
-    deleteButton.addEventListener("click", async () => {
-      //Отримуємо список таблиці з chrome.storage
-      let list = await getStorageData(storageKey);
-      let name = select.querySelector("option[selected=true]").value;
-      const itemIndex = list.findIndex((elem) => elem.name == name);
-
-      //Видаляємо елемент з списку
-      list.splice(itemIndex, 1);
-      //зберігаємо дані в chrome.storage
-      chrome.storage.local.set({ [storageKey]: list });
-      //показуємо опції вже з новою таблицею
-      showSpreadsheet(select, deleteButton, storageKey);
-    });
-  }
-
-  async function showSpreadsheet(select, deleteButton, storageKey) {
-    const options = select.querySelectorAll("option[value]");
-
-    let list = await getStorageData([storageKey]);
-
-    try {
-      //якщо таблиць ще немає ставимо для селекту значення disabled
-      if (!list || !list.length) {
-        chrome.storage.local.set({ [storageKey]: [] });
-        list = [];
-        select.setAttribute("disabled", true);
-        deleteButton.setAttribute("disabled", true);
-      }
-
-      if (options) {
-        //видаляємо всі опції
-        options.forEach((item) => {
-          item.remove();
-        });
-      }
-
-      //Якщо в списку немає атрибута селектед тоді встановлюємо його для останнього елемента
-      if (list.length) {
-        const itemIndex = list.findIndex((elem) => elem.selected);
-        if (itemIndex === -1) {
-          list[list.length - 1].selected = true;
-          chrome.storage.local.set({ [storageKey]: list });
-        }
-      }
-
-      list.forEach((item) => {
-        //створюємо опції на основі актуальних даних
-        const option = document.createElement("option");
-        option.value = item.name;
-        option.textContent = item.name;
-        if (item.selected) {
-          option.setAttribute("selected", true);
-        }
-        select.append(option);
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   //Викликаємо функцію яка додає нову таблицю
   addSpreadsheet(
     form,
-    select,
     addButton,
-    name,
-    webhookLink,
-    spreadsheetLink,
-    deleteButton
+    nameInputSelector,
+    webhookInputSelector,
+    spreadsheetInputSelector
   );
+
   //Викликаємо функцію яка змінює таблицю
-  changeSpreadsheet(select, storageKey);
+  changeSpreadsheet(storageKeys);
   //Викликаємо функцію яка видаляє таблицю
-  deleteSpreadsheet(select, deleteButton, storageKey);
+  deleteSpreadsheet(storageKeys);
   //Викликаємо функцію яка показую таблиці
-  showSpreadsheet(select, deleteButton, storageKey);
+  showSpreadsheet(storageKeys);
 }

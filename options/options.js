@@ -9,13 +9,11 @@ window.onload = () => {
     //Таблиці
     spreadsheet(
       ".spreadsheetForm",
-      ".filter-select",
       "#addSpreadsheet",
       "#name",
       "#webhookLink",
       "#spreadsheetLink",
-      ".filter-delete",
-      "filterList"
+      ["filterList", "scrapeList"]
     );
   })();
 };
