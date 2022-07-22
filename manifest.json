@@ -12,11 +12,15 @@
       ],
       "js": [
         "content.js",
+        "filter.js",
         "scraper.js",
         "helpers/fetchData.js",
         "helpers/createAlert.js",
         "helpers/getStorageData.js",
-        "helpers/addCSS.js"
+        "helpers/addCSS.js",
+        "helpers/sleep.js",
+        "scraper/helpers/collectData.js",
+        "scraper/helpers/nextPage.js"
       ],
       "all_frames": true,
       "run_at": "document_end"
@@ -41,7 +45,7 @@
       "matches": ["https://s.taobao.com/*"]
     }
   ],
-  "permissions": ["tabs", "storage", "scripting"],
+  "permissions": ["tabs", "storage", "scripting", "commands"],
   "host_permissions": [
     "*://s.taobao.com/*",
     "*://script.google.com/*",

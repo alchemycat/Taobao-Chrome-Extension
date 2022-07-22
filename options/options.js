@@ -3,7 +3,7 @@ window.onload = () => {
     //Активуємо таби
     tabs(".nav-link", ".tab-pane");
     //забираємо дані зі storage про те чи потрібно використовувати whitelist якщо вони там вже є
-    inputs("#mrg", "#whitelist", "#whitelistCheckbox");
+    inputs("#mrg", "#timeout", "#whitelist", "#whitelistCheckbox");
     //Встановлюємо хоткеї
     hotkeys("#hotkey", "#hotletter");
     //Таблиці

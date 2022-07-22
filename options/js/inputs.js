@@ -1,22 +1,29 @@
 async function inputs(
   inputRatingSelector,
+  timeoutSelector,
   whitelistSelector,
   whitelistCheckboxSelector
 ) {
   //Пошук елементів
   const inputRating = document.querySelector(inputRatingSelector),
+    timeoutInput = document.querySelector(timeoutSelector),
     whitelist = document.querySelector(whitelistSelector),
     whitelistCheckbox = document.querySelector(whitelistCheckboxSelector);
 
-  //забираємо дані зі storage про мінімальний рейтинг якщо вони там вже є
+  //забираємо дані зі storage
   let minimalRating = await getStorageData("minimalRating");
-  //забираємо дані зі storage про те чи додані в whitelist вже якісь id
   let whitelistValue = await getStorageData("whitelist");
   let isChecked = await getStorageData("whitelistChecked");
+  let timeout = await getStorageData("timeout");
 
   //Встановлюємо мінімальний рейтинг
   if (minimalRating) {
     inputRating.value = minimalRating;
+  }
+
+  //Встановлюємо таймаут
+  if (timeout) {
+    timeoutInput.value = timeout;
   }
 
   //активуємо textarea або додаємо disabled
@@ -38,6 +45,15 @@ async function inputs(
     }
     //додаємо отримані дані у storage
     chrome.storage.local.set({ minimalRating: inputRating.value });
+  });
+
+  //слідкуємо за подією input для таймауту
+  timeoutInput.addEventListener("input", () => {
+    if (/\D/.text(timeoutInput.value)) {
+      timeoutInput.value = timeoutInput.value.replace(/\D/, "");
+    }
+
+    chrome.storage.local.set({ timeout: timeoutInput.value });
   });
 
   //слідкуємо за активністю checkbox

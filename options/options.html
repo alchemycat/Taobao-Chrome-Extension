@@ -51,19 +51,35 @@
               >
                 <h2 class="settings__header">Критерії фільтрації</h2>
                 <hr />
-                <div class="rating">
-                  <div class="mb-3">
-                    <label for="mrg" class="form-label"
-                      >Мінімальний рейтинг</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="mrg"
-                      placeholder="rating"
-                    />
+                <div class="row">
+                  <div class="col">
+                    <div class="mb-3">
+                      <label for="mrg" class="form-label"
+                        >Мінімальний рейтинг</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="mrg"
+                        placeholder="Рейтинг"
+                      />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="mb-3">
+                      <label for="timeout" class="form-label"
+                        >Таймаут (Секунди)</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="timeout"
+                        placeholder="Таймаут"
+                      />
+                    </div>
                   </div>
                 </div>
+
                 <div class="wl">
                   <div class="mb-3 form-check">
                     <input
@@ -79,7 +95,7 @@
                     <textarea
                       class="form-control"
                       aria-label="With textarea"
-                      placeholder="White List"
+                      placeholder="Вайтліст"
                       id="whitelist"
                       rows="10"
                     ></textarea>
