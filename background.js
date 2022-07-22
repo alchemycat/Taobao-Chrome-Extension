@@ -24,18 +24,20 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
     //Обираємо цю таблицю
     const item = spreadsheetList[itemIndex];
     //Достаємо з неї дані про webhook та посилання на саму таблицю
-    const { spreadsheetLink, postLink } = item;
+    const { spreadsheetLink, webhookLink } = item;
 
     //Робимо запит по даним які дістали
-    fetch(postLink, {
+    fetch(webhookLink, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ url: spreadsheetLink, body: request.json }), //В реквесті передаємо лінк на таблицю та json
     }).then((response) => {
+      console.log(response);
       if (response.status === 200) {
         //Якщо статус код запиту 200 то відправляємо меседж до content.js що все ок і дані збережені
+
         chrome.tabs.sendMessage(sender.tab.id, {
           type: "DELIVERY",
           message: "Дані збережено успішно",
@@ -88,7 +90,7 @@ function handleKeys(hotletter, hotkey) {
       }
       if (e.key === hotletter && button) {
         e.preventDefault();
-        let idNote = await prompt("Задайте idNote: ");
+        let idNote = prompt("Задайте idNote: ");
         if (!idNote) {
           return;
         }
@@ -107,7 +109,8 @@ function handleKeys(hotletter, hotkey) {
 
 chrome.commands.onCommand.addListener((command, tab) => {
   if (command == "scrape-data") {
-    chrome.tabs.sendMessage(tab.tabId, "START_SCRAPE");
+    console.log(`start scrape: ${tab.id}`);
+    chrome.tabs.sendMessage(tab.id, { type: "START_SCRAPE" });
   }
 });
 
