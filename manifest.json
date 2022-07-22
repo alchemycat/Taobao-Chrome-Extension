@@ -12,15 +12,15 @@
       ],
       "js": [
         "content.js",
-        "filter.js",
-        "scraper.js",
-        "helpers/fetchData.js",
-        "helpers/createAlert.js",
-        "helpers/getStorageData.js",
-        "helpers/addCSS.js",
-        "helpers/sleep.js",
+        "filter/filter.js",
+        "filter/helpers/fetchData.js",
+        "filter/helpers/createAlert.js",
+        "filter/helpers/getStorageData.js",
+        "filter/helpers/addCSS.js",
+        "scraper/scraper.js",
         "scraper/helpers/collectData.js",
-        "scraper/helpers/nextPage.js"
+        "scraper/helpers/nextPage.js",
+        "scraper/helpers/sleep.js"
       ],
       "all_frames": true,
       "run_at": "document_end"
@@ -47,11 +47,17 @@
   ],
   "permissions": ["tabs", "storage", "scripting", "commands"],
   "host_permissions": [
-    "*://s.taobao.com/*",
-    "*://script.google.com/*",
-    "*://*.tmall.com/*"
+    "*://*.taobao.com/*",
+    "*://*.tmall.com/*",
+    "*://script.google.com/*"
   ],
   "action": {
     "default_title": "Taobao"
+  },
+  "commands": {
+    "scrape-data": {
+      "suggested_key": "Ctrl+C",
+      "description": "Start scrape data"
+    }
   }
 }

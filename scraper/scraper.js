@@ -1,15 +1,23 @@
 async function scraper() {
-  // chrome.runtime.sendMessage({ type: "GET_SHOP_ID" });
+  let timeout = await getStorageData("timeout");
+  timeout = parseInt(timeout);
 
+  //зберігаємо shopId
+  const shopId = document.querySelector("div[shopId]").getAttribute("shopId");
+
+  //Очікуємо зміну url
   let lastUrl = location.href;
 
   new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
+      //Якщо url змінився знову запускаємо функцію збору даних
       lastUrl = url;
-      scrapeData();
+      scrapeData(shopId);
     }
   }).observe(document, { subtree: true, childList: true });
+
+  //-----------------------
 
   chrome.runtime.onMessage.addListener(async (response) => {
     //Тут чекаємо на повідомлення чи змінилась сторінка
@@ -18,7 +26,7 @@ async function scraper() {
     }
   });
 
-  async function scrapeData() {
+  async function scrapeData(shopId) {
     //Збір даних
     const collectedData = await collectData();
 
@@ -42,6 +50,6 @@ async function scraper() {
     }
 
     //Таймаут
-    await sleep(5000);
+    await sleep(timeout);
   }
 }

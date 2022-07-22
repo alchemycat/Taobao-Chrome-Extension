@@ -13,7 +13,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 });
 
 //Слідкуємо за меседжами які приходять від content.js
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender) => {
   //Якщо реквест == SAVE_DATA то потрібно зберегти дані в таблицю
   if (request.type == "SAVE_DATA") {
     //Достаємо всі таблиці які додані із chrome.storage
@@ -67,18 +67,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       args: [hotletter, hotkey],
     });
   }
-  if (request.type == "GET_SHOP_ID") {
-    chrome.scripting.executeScript({
-      target: {
-        tabId: sender.tab.id,
-      },
-      func: getShopId,
-    });
-
-    function getShopId() {
-      console.log(`Shop ID: ${window.shop_config.shopId}`);
-    }
-  }
 });
 
 //Це сам скрипт який ми додаємо на сторінку
@@ -116,6 +104,13 @@ function handleKeys(hotletter, hotkey) {
     false
   );
 }
+
+chrome.commands.onCommand.addListener((command, tab) => {
+  if (command == "scrape-data") {
+    chrome.tabs.sendMessage(tab.tabId, "START_SCRAPE");
+  }
+});
+
 //Функція для того щоб продати дані з chrome.storage
 function getStorageData(sKey) {
   return new Promise(function (resolve, reject) {
