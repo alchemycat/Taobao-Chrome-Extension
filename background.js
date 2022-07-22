@@ -54,9 +54,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   //Якщо реквест == INJECT тоді нам потрібно додати хоткеї до сторінки
   if (request.type == "INJECT") {
     //Спочатку беремо хоткеї зі chrome.storage
+    //Далі виконуємо скрипт який додасть наші хоткеї до сторінки
+
     const hotletter = await getStorageData("hotletter");
     const hotkey = await getStorageData("hotkey");
-
     //Далі виконуємо скрипт який додасть наші хоткеї до сторінки
     chrome.scripting.executeScript({
       target: {
@@ -66,7 +67,20 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       args: [hotletter, hotkey],
     });
   }
+  if (request.type == "GET_SHOP_ID") {
+    chrome.scripting.executeScript({
+      target: {
+        tabId: sender.tab.id,
+      },
+      func: getShopId,
+    });
+
+    function getShopId() {
+      console.log(`Shop ID: ${window.shop_config.shopId}`);
+    }
+  }
 });
+
 //Це сам скрипт який ми додаємо на сторінку
 function handleKeys(hotletter, hotkey) {
   document.addEventListener(
