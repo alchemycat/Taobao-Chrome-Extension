@@ -1,7 +1,7 @@
-async function setHotkeys() {
+async function hotkeys(hotkeySelector, hotletterSelector) {
   //Встановлюємо хоткеї
-  const hotkey = document.getElementById("hotkey");
-  const hotletter = document.getElementById("hotletter");
+  const hotkey = document.querySelector(hotkeySelector);
+  const hotletter = document.querySelector(hotletterSelector);
 
   //отримуємо актуальні хоткеї
   let key = await getStorageData("hotkey");

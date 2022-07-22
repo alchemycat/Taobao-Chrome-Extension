@@ -5,7 +5,7 @@ window.onload = () => {
     //забираємо дані зі storage про те чи потрібно використовувати whitelist якщо вони там вже є
     inputs("#mrg", "#whitelist", "#whitelistCheckbox");
     //Встановлюємо хоткеї
-    setHotkeys();
+    hotkeys("#hotkey", "#hotletter");
     //Таблиці
     spreadsheet(
       ".spreadsheetForm",
