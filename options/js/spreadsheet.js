@@ -11,9 +11,9 @@ function spreadsheet(
   const form = document.querySelector(formSelector),
     select = document.querySelector(selectSelector),
     addButton = document.querySelector(addButtonSelector),
-    name = select.querySelector(nameInputSelector),
-    webhookLink = select.querySelector(webhookInputSelector),
-    spreadsheetLink = select.querySelector(spreadsheetInputSelector),
+    name = document.querySelector(nameInputSelector),
+    webhookLink = document.querySelector(webhookInputSelector),
+    spreadsheetLink = document.querySelector(spreadsheetInputSelector),
     deleteButton = document.querySelector(deleteButtonSelector);
   //Функція яка додає нову таблицю в chrome storage
   async function addSpreadsheet(
@@ -26,23 +26,22 @@ function spreadsheet(
     deleteButton
   ) {
     addButton.addEventListener("click", async () => {
-      const radios = document.querySelectorAll('[name="spreadsheet_type"]');
+      radios = document.querySelectorAll('[name="spreadsheet_type"]');
       let key;
-
       radios.forEach((radio) => {
         if (radio.checked) {
-          key = radio.getAttribute("id");
+          key = radio.id;
         }
       });
 
       //Отримуємо список таблиці з chrome.storage
-      let list = await getStorageData(key);
+      let list = await getStorageData([key]);
 
       //Перевіряємо чи користувач ввів нову назву для таблиці
       if (!name.value) {
         name.focus();
         //Якщо ні то нагадуємо що потрібно ввести назву
-        addNotification(buttonSpreadsheet, "Додайте назву", "error");
+        addNotification(addButton, "Додайте назву", "error");
         return;
       }
       //Перевіряємо чи користувач ввів нове посилання для вебхука
@@ -50,7 +49,7 @@ function spreadsheet(
         webhookLink.focus();
         //Якщо ні то нагадуємо що потрібно ввести посилання для вебхука
         addNotification(
-          buttonSpreadsheet,
+          addButton,
           "Додайте посилання для відправки POST запиту",
           "error"
         );
@@ -60,11 +59,7 @@ function spreadsheet(
       if (!spreadsheetLink.value) {
         spreadsheetLink.focus();
         //Якщо ні то нагадуємо що потрібно ввести посилання для таблиці
-        addNotification(
-          buttonSpreadsheet,
-          "Додайте посилання на таблицю",
-          "error"
-        );
+        addNotification(addButton, "Додайте посилання на таблицю", "error");
         return;
       }
 
@@ -75,7 +70,7 @@ function spreadsheet(
       if (!resultIndex) {
         name.focus();
         addNotification(
-          buttonSpreadsheet,
+          addButton,
           "Вкажіть іншу назву, вже є таблиця з такою назвою",
           "error"
         );
@@ -104,11 +99,11 @@ function spreadsheet(
         deleteButton.removeAttribute("disabled");
 
         //зберігаємо дані в chrome.storage
-        chrome.storage.local.set({ list });
+        chrome.storage.local.set({ [key]: list });
         //сповіщуємо користувача що успішно додали таблицю
-        addNotification(buttonSpreadsheet, "Таблиця успішно додана", "success");
+        addNotification(addButton, "Таблиця успішно додана", "success");
         //показуємо опції вже з новою таблицею
-        showOptions();
+        showSpreadsheet(select, deleteButton, key);
       }
     });
   }
@@ -142,7 +137,7 @@ function spreadsheet(
           list[itemIndex].selected = true;
 
           //обновляємо дані в chrome.storage
-          chrome.storage.local.set({ list });
+          chrome.storage.local.set({ [storageKey]: list });
         }
       } catch (err) {
         console.log(err);
@@ -160,7 +155,7 @@ function spreadsheet(
       //Видаляємо елемент з списку
       list.splice(itemIndex, 1);
       //зберігаємо дані в chrome.storage
-      chrome.storage.local.set({ list });
+      chrome.storage.local.set({ [storageKey]: list });
       //показуємо опції вже з новою таблицею
       showSpreadsheet(select, deleteButton, storageKey);
     });
@@ -169,12 +164,13 @@ function spreadsheet(
   async function showSpreadsheet(select, deleteButton, storageKey) {
     const options = select.querySelectorAll("option[value]");
 
-    let list = await getStorageData(storageKey);
+    let list = await getStorageData([storageKey]);
 
     try {
       //якщо таблиць ще немає ставимо для селекту значення disabled
       if (!list || !list.length) {
-        chrome.storage.local.set({ list: [] });
+        chrome.storage.local.set({ [storageKey]: [] });
+        list = [];
         select.setAttribute("disabled", true);
         deleteButton.setAttribute("disabled", true);
       }
@@ -191,7 +187,7 @@ function spreadsheet(
         const itemIndex = list.findIndex((elem) => elem.selected);
         if (itemIndex === -1) {
           list[list.length - 1].selected = true;
-          chrome.storage.local.set({ list });
+          chrome.storage.local.set({ [storageKey]: list });
         }
       }
 
