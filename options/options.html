@@ -98,12 +98,12 @@
                   <h3>Вибір таблиці (Ручна фільтрація)</h3>
                   <div class="col">
                     <select
-                      class="form-select select__filter"
+                      class="form-select filter-select"
                       aria-label="select"
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button filter__delete" class="btn btn-danger">
+                    <button type="button filter-delete" class="btn btn-danger">
                       Видалити таблицю
                     </button>
                   </div>
@@ -112,12 +112,12 @@
                   <h3>Вибір таблиці (Парсинг)</h3>
                   <div class="col">
                     <select
-                      class="form-select select__scrape"
+                      class="form-select scrape-select"
                       aria-label="select"
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button" class="btn btn-danger scrape__delete">
+                    <button type="button" class="btn btn-danger scrape-delete">
                       Видалити таблицю
                     </button>
                   </div>
@@ -127,33 +127,33 @@
                   <h3>Хоткеї для збереження даних (Ручна фільтрація)</h3>
                   <div class="col">
                     <div class="input-group">
-                      <span class="input-group-text" id="basic-addon"
+                      <span class="input-group-text" id="basic-hotkey"
                         >Клавіша:</span
                       >
                       <input
                         type="text"
                         class="form-control"
                         id="hotkey"
-                        aria-describedby="basic-addon"
+                        aria-describedby="basic-hotkey"
                       />
                     </div>
                   </div>
                   <div class="col">
                     <div class="input-group">
-                      <span class="input-group-text" id="basic-addon0"
+                      <span class="input-group-text" id="basic-hotletter"
                         >Літера:</span
                       >
                       <input
                         type="text"
                         class="form-control"
                         id="hotletter"
-                        aria-describedby="basic-addon0"
+                        aria-describedby="basic-hotletter"
                       />
                     </div>
                   </div>
                 </div>
                 <hr />
-                <form id="create_spreadsheet">
+                <form class="spreadsheetForm">
                   <h3>Додати нову таблицю</h3>
                   <div
                     class="row d-flex align-items-center justify-content-center"
@@ -162,47 +162,47 @@
                       <label for="name" class="form-label">Назва:</label>
 
                       <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon1"
+                        <span class="input-group-text" id="basic-name"
                           >Назва:</span
                         >
                         <input
                           type="text"
                           class="form-control"
                           id="name"
-                          aria-describedby="basic-addon1"
+                          aria-describedby="basic-name"
                         />
                       </div>
                     </div>
                     <div class="col">
-                      <label for="post_link" class="form-label"
+                      <label for="webhookLink" class="form-label"
                         >Посилання для Webhook</label
                       >
 
                       <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon2"
+                        <span class="input-group-text" id="basic-webhook"
                           >URL:</span
                         >
                         <input
                           type="text"
                           class="form-control"
-                          id="post_link"
-                          aria-describedby="basic-addon2"
+                          id="webhookLink"
+                          aria-describedby="basic-webhook"
                         />
                       </div>
                     </div>
                     <div class="col">
-                      <label for="spreadsheet_link" class="form-label"
+                      <label for="spreadsheetLink" class="form-label"
                         >Посилання на таблицю</label
                       >
                       <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon3"
+                        <span class="input-group-text" id="basic-spreadsheet"
                           >URL:</span
                         >
                         <input
                           type="text"
                           class="form-control"
-                          id="spreadsheet_link"
-                          aria-describedby="basic-addon3"
+                          id="spreadsheetLink"
+                          aria-describedby="basic-spreadsheet"
                         />
                       </div>
                     </div>
@@ -237,7 +237,7 @@
                       <button
                         type="button"
                         class="btn btn-primary"
-                        id="add_spreadsheet"
+                        id="addSpreadsheet"
                       >
                         Додати таблицю
                       </button>
@@ -255,11 +255,8 @@
     <script src="js/tabs.js"></script>
     <script src="js/init.js"></script>
     <script src="js/setHotkeys.js"></script>
-    <script src="js/showOptions.js"></script>
-    <script src="js/changeSpreadsheet.js"></script>
-    <script src="js/addSpreadsheet.js"></script>
-    <script src="js/deleteSpreadsheet.js"></script>
     <script src="js/addNotification.js"></script>
+    <script src="js/spreadsheet.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

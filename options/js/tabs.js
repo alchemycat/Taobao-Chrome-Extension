@@ -1,7 +1,7 @@
-function tabs() {
+function tabs(linksSelector, contentSelector) {
   //Таби, змінюють меню
-  const navlinks = document.querySelectorAll(".nav-link");
-  const tabs = document.querySelectorAll(".tab-pane");
+  const navlinks = document.querySelectorAll(linksSelector);
+  const tabs = document.querySelectorAll(contentSelector);
 
   navlinks.forEach((link, i) => {
     link.addEventListener("click", () => {
