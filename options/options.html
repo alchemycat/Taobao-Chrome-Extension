@@ -2,7 +2,6 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <!-- CSS only -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -96,23 +95,36 @@
                 <h2 class="settings__header">Налаштування таблиць</h2>
                 <hr />
                 <div class="row mb-3">
-                  <h3>Вибір таблиці</h3>
+                  <h3>Вибір таблиці (Ручна фільтрація)</h3>
                   <div class="col">
                     <select
-                      class="form-select"
+                      class="form-select select__filter"
                       aria-label="select"
-                      id="select"
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button" class="btn btn-danger" id="delete">
-                      Видалити поточну таблицю
+                    <button type="button filter__delete" class="btn btn-danger">
+                      Видалити таблицю
+                    </button>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <h3>Вибір таблиці (Парсинг)</h3>
+                  <div class="col">
+                    <select
+                      class="form-select select__scrape"
+                      aria-label="select"
+                    ></select>
+                  </div>
+                  <div class="col">
+                    <button type="button" class="btn btn-danger scrape__delete">
+                      Видалити таблицю
                     </button>
                   </div>
                 </div>
                 <hr />
                 <div class="row mb-3">
-                  <h3>Встановлення хоткеїв</h3>
+                  <h3>Хоткеї для збереження даних (Ручна фільтрація)</h3>
                   <div class="col">
                     <div class="input-group">
                       <span class="input-group-text" id="basic-addon"
@@ -195,6 +207,31 @@
                       </div>
                     </div>
                   </div>
+                  <div class="col mb-3">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="spreadsheet_type"
+                        id="type_filter"
+                      />
+                      <label class="form-check-label" for="type_filter">
+                        Ручна фільтрація
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="spreadsheet_type"
+                        id="type_scrape"
+                        checked
+                      />
+                      <label class="form-check-label" for="type_scrape">
+                        Парсинг
+                      </label>
+                    </div>
+                  </div>
                   <div class="row">
                     <div class="col-3">
                       <button
@@ -215,6 +252,14 @@
     </div>
 
     <script src="../helpers/getStorageData.js"></script>
+    <script src="js/tabs.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/setHotkeys.js"></script>
+    <script src="js/showOptions.js"></script>
+    <script src="js/changeSpreadsheet.js"></script>
+    <script src="js/addSpreadsheet.js"></script>
+    <script src="js/deleteSpreadsheet.js"></script>
+    <script src="js/addNotification.js"></script>
     <script src="options.js"></script>
   </body>
 </html>
