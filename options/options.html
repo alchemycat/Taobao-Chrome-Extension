@@ -69,9 +69,9 @@
                     <input
                       type="checkbox"
                       class="form-check-input"
-                      id="whitelist_checkbox"
+                      id="whitelistCheckbox"
                     />
-                    <label class="form-check-label" for="whitelist_checkbox"
+                    <label class="form-check-label" for="whitelistCheckbox"
                       >Включити White List</label
                     >
                   </div>
@@ -103,7 +103,7 @@
                     ></select>
                   </div>
                   <div class="col">
-                    <button type="button filter-delete" class="btn btn-danger">
+                    <button type="button" class="btn btn-danger filter-delete">
                       Видалити таблицю
                     </button>
                   </div>
@@ -213,9 +213,9 @@
                         class="form-check-input"
                         type="radio"
                         name="spreadsheet_type"
-                        id="type_filter"
+                        id="filterList"
                       />
-                      <label class="form-check-label" for="type_filter">
+                      <label class="form-check-label" for="filterList">
                         Ручна фільтрація
                       </label>
                     </div>
@@ -224,10 +224,10 @@
                         class="form-check-input"
                         type="radio"
                         name="spreadsheet_type"
-                        id="type_scrape"
+                        id="scrapeList"
                         checked
                       />
-                      <label class="form-check-label" for="type_scrape">
+                      <label class="form-check-label" for="scrapeList">
                         Парсинг
                       </label>
                     </div>
@@ -253,10 +253,10 @@
 
     <script src="../helpers/getStorageData.js"></script>
     <script src="js/tabs.js"></script>
-    <script src="js/init.js"></script>
+    <script src="js/inputs.js"></script>
     <script src="js/setHotkeys.js"></script>
-    <script src="js/addNotification.js"></script>
     <script src="js/spreadsheet.js"></script>
+    <script src="js/addNotification.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

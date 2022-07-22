@@ -15,7 +15,6 @@ function spreadsheet(
     webhookLink = select.querySelector(webhookInputSelector),
     spreadsheetLink = select.querySelector(spreadsheetInputSelector),
     deleteButton = document.querySelector(deleteButtonSelector);
-
   //Функція яка додає нову таблицю в chrome storage
   async function addSpreadsheet(
     form,
@@ -24,12 +23,20 @@ function spreadsheet(
     name,
     webhookLink,
     spreadsheetLink,
-    deleteButton,
-    storageKey
+    deleteButton
   ) {
     addButton.addEventListener("click", async () => {
+      const radios = document.querySelectorAll('[name="spreadsheet_type"]');
+      let key;
+
+      radios.forEach((radio) => {
+        if (radio.checked) {
+          key = radio.getAttribute("id");
+        }
+      });
+
       //Отримуємо список таблиці з chrome.storage
-      let list = await getStorageData(storageKey);
+      let list = await getStorageData(key);
 
       //Перевіряємо чи користувач ввів нову назву для таблиці
       if (!name.value) {
@@ -211,8 +218,7 @@ function spreadsheet(
     name,
     webhookLink,
     spreadsheetLink,
-    deleteButton,
-    storageKey
+    deleteButton
   );
   //Викликаємо функцію яка змінює таблицю
   changeSpreadsheet(select, storageKey);
@@ -220,12 +226,4 @@ function spreadsheet(
   deleteSpreadsheet(select, deleteButton, storageKey);
   //Викликаємо функцію яка показую таблиці
   showSpreadsheet(select, deleteButton, storageKey);
-  //Вибір типу таблиці
-  const radios = document.querySelector('[name="spreadsheet_type"]');
-
-  radios.forEach((radio) => {
-    radio.addEventListener("change", (e) => {
-      console.log(`Checked: ${e.target.id}`);
-    });
-  });
 }
