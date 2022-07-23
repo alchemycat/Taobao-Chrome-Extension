@@ -13,7 +13,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 });
 
 //Слідкуємо за меседжами які приходять від content.js
-chrome.runtime.onMessage.addListener(async (response, sender) => {
+chrome.runtime.onMessage.addListener(async (response, sender, sendResponse) => {
   //Якщо реквест == SAVE_DATA то потрібно зберегти дані в таблицю
   if (response.type == "SAVE_DATA") {
     //Достаємо всі таблиці які додані із chrome.storage
@@ -23,9 +23,10 @@ chrome.runtime.onMessage.addListener(async (response, sender) => {
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
     //Обираємо цю таблицю
     const item = spreadsheetList[itemIndex];
+    console.log(`Table: ${JSON.stringify(item)}`);
     //Достаємо з неї дані про webhook та посилання на саму таблицю
     const { spreadsheetLink, webhookLink } = item;
-
+    console.log(response);
     //Робимо запит по даним які дістали
     fetch(webhookLink, {
       method: "POST",
@@ -70,11 +71,8 @@ chrome.runtime.onMessage.addListener(async (response, sender) => {
     });
   }
   if (response.type == "GET_TAB_ID") {
-    console.log("tab id sended");
-    chrome.tabs.sendMessage(sender.tab.id, {
-      type: "TAB_ID",
-      tabId: sender.tab.id,
-    });
+    console.log(`tab id sended: ${sender.tab.id}`);
+    sendResponse(sender.tab.id);
   }
 });
 

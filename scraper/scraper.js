@@ -1,6 +1,5 @@
 async function scraper() {
-  chrome.runtime.sendMessage({ type: "GET_TAB_ID" });
-
+  //зберігаємо таймаут
   let timeout = await getStorageData("timeout");
   timeout = parseInt(timeout);
 
@@ -8,50 +7,43 @@ async function scraper() {
   const shopId = document.querySelector("div[shopId]").getAttribute("shopId");
   console.log(`shopID: ${shopId}`);
 
+  let tabId = await (() => {
+    return new Promise((resolve, reject) => {
+      console.log("get tab id");
+      chrome.runtime.sendMessage({ type: "GET_TAB_ID" }, (response) => {
+        if (response) {
+          return resolve(response);
+        }
+      });
+    });
+  })();
+
+  console.log(`tabId: ${tabId}`);
+
+  const tabData = await getStorageData(tabId);
+
+  console.log(`tabData: ${JSON.stringify(tabData)}`);
+
+  if (tabData && tabData.status) {
+    alert(`sleep: ${timeout}`);
+    await sleep(timeout);
+    alert("Continue scraping");
+    scrapeData(shopId, tabId);
+  }
+
   chrome.runtime.onMessage.addListener(async (response) => {
-    //Тут чекаємо на повідомлення чи змінилась сторінка
+    //Тут чекаємо на повідомлення чи потрібно починати парсити
     if (response.type == "START_SCRAPE") {
-      const tabId = response.tabId;
-
-      console.log(`sender id: ${tabId}`);
-
-      console.log("start");
-
+      console.log("Scraping start");
       chrome.storage.local.set({ [tabId]: { data: [], status: true } });
 
       scrapeData(shopId, tabId);
     }
-    if (response.type == "TAB_ID") {
-      const tabId = response.tabId;
-      console.log(`current tabid: ${tabId}`);
-      try {
-        let isStart = await getStorageData(tabId);
-        console.log(`tabid data: ${isStart}`);
-        if (isStart) {
-          if (isStart.status) {
-            scrapeData(shopId, tabId);
-          } else {
-            const lastData = await getStorageData(tabId);
-            //Відправляємо дані до background
-            chrome.runtime.sendMessage({
-              type: "SAVE_DATA",
-              json: lastData.data,
-              list: "scrapeList",
-            });
-            console.log(`tabid before remove: ${tabId}`);
-            chrome.storage.local.remove(tabId);
-            console.log("scraper off");
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
   });
 
   async function scrapeData(shopId, tabId) {
+    console.log(`Function: scrape data`);
     try {
-      console.log("scraping started");
       //Збір даних
       const collectedData = await collectData();
 
@@ -60,12 +52,11 @@ async function scraper() {
 
       //Об'єднання старих і нових даних
       const mergedData = previousData.data.concat(collectedData);
-      console.log(`merged data: ${mergedData}`);
+      console.log(`Merged data: ${mergedData}`);
       //Збереження даних
       chrome.storage.local.set({ [tabId]: { data: mergedData, status: true } });
 
       //Наступна сторінка
-      await sleep(timeout);
       await nextPage();
     } catch (err) {
       console.log(err);
@@ -77,8 +68,8 @@ async function scraper() {
         list: "scrapeList",
       });
       console.log(`tabid before remove: ${tabId}`);
-      chrome.storage.local.remove(tabId);
-      console.log("script end, data saved");
+      chrome.storage.local.remove(tabId.toString());
+      alert("end scraping");
     }
   }
   //Збираємо дані зі сторінки в массив
@@ -127,6 +118,26 @@ async function scraper() {
       } catch (err) {
         reject(err);
       }
+    });
+  }
+
+  //Відкриваємо наступну сторінку
+  function nextPage() {
+    return new Promise((resolve, reject) => {
+      const nextButton = document.querySelector(".next");
+
+      if (!nextButton) {
+        reject(false);
+      }
+
+      nextButton.click();
+      resolve(true);
+    });
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, ms);
     });
   }
 }

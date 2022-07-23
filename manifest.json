@@ -17,10 +17,7 @@
         "filter/helpers/createAlert.js",
         "filter/helpers/getStorageData.js",
         "filter/helpers/addCSS.js",
-        "scraper/scraper.js",
-        "scraper/helpers/collectData.js",
-        "scraper/helpers/nextPage.js",
-        "scraper/helpers/sleep.js"
+        "scraper/scraper.js"
       ],
       "all_frames": true,
       "run_at": "document_start"
