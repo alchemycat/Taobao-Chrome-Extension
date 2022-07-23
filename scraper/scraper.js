@@ -81,8 +81,8 @@ async function scraper() {
 
         items.forEach((item) => {
           try {
-            // const id = item.getAttribute("data-id");
-            const title = item.querySelector(".item-name").textContent;
+            let title = item.querySelector(".item-name").textContent;
+            title = title.trim();
             let photo = item.querySelector(".photo img").src;
             let url = item.querySelector(".photo a").href;
             const price = item.querySelector(".c-price").textContent;
