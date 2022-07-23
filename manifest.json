@@ -16,7 +16,7 @@
         "filter/helpers/fetchData.js",
         "filter/helpers/createAlert.js",
         "filter/helpers/getStorageData.js",
-        "filter/helpers/addCSS.js",
+        "helpers/addCSS.js",
         "scraper/scraper.js"
       ],
       "all_frames": true,
@@ -39,7 +39,11 @@
         "assets/sprite/sprite.css",
         "assets/alert/alert.css"
       ],
-      "matches": ["https://s.taobao.com/*"]
+      "matches": [
+        "https://s.taobao.com/*",
+        "*://*.taobao.com/*",
+        "*://*.tmall.com/*"
+      ]
     }
   ],
   "permissions": ["tabs", "storage", "scripting", "commands"],
