@@ -53,7 +53,7 @@
   },
   "commands": {
     "scrape-data": {
-      "suggested_key": "Ctrl+C",
+      "suggested_key": "Ctrl+Shift+V",
       "description": "Start scrape data"
     }
   }

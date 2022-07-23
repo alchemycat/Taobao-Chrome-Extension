@@ -5,11 +5,9 @@ async function scraper() {
 
   //зберігаємо shopId
   const shopId = document.querySelector("div[shopId]").getAttribute("shopId");
-  console.log(`shopID: ${shopId}`);
 
   let tabId = await (() => {
     return new Promise((resolve, reject) => {
-      console.log("get tab id");
       chrome.runtime.sendMessage({ type: "GET_TAB_ID" }, (response) => {
         if (response) {
           return resolve(response);
@@ -18,18 +16,11 @@ async function scraper() {
     });
   })();
 
-  console.log(`tabId: ${tabId}`);
-
   const tabData = await getStorageData(tabId);
 
-  console.log(`tabData: ${JSON.stringify(tabData)}`);
-
   if (tabData && tabData.status) {
-    alert(`sleep: ${timeout}`);
-    const category = tabData[0][6];
-    console.log(`Category: ${category}`);
+    const category = tabData.data[0][7];
     await sleep(timeout);
-    alert("Continue scraping");
     scrapeData(shopId, tabId, category);
   }
 
@@ -48,7 +39,6 @@ async function scraper() {
   });
 
   async function scrapeData(shopId, tabId, category) {
-    console.log(`Function: scrape data`);
     try {
       //Збір даних
       const collectedData = await collectData(category);
@@ -59,7 +49,6 @@ async function scraper() {
 
       //Об'єднання старих і нових даних
       const mergedData = previousData.concat(collectedData);
-      console.log(`Merged data: ${JSON.stringify(mergedData)}`);
       //Збереження даних
       chrome.storage.local.set({
         [tabId]: { data: mergedData, status: true },
@@ -68,24 +57,18 @@ async function scraper() {
       //Наступна сторінка
       await nextPage();
     } catch (err) {
-      console.log(err);
       const lastData = await getStorageData(tabId);
       //Відправляємо дані до background
-      chrome.runtime.sendMessage(
-        {
-          type: "SAVE_DATA",
-          json: lastData.data,
-          list: "scrapeList",
-          shopId: shopId,
-          script: "scrape",
-        },
-        (response) => {
-          createAlert(response.text, response.status);
-        }
-      );
-      console.log(`tabid before remove: ${tabId}`);
+      // console.log(`Data for save: ${JSON.stringify(lastData.data)}`);
+      chrome.runtime.sendMessage({
+        type: "SAVE_DATA",
+        json: lastData.data,
+        list: "scrapeList",
+        script: "scrape",
+        shopId: shopId,
+      });
       chrome.storage.local.remove(tabId.toString());
-      alert("end scraping");
+      createAlert("Зберігаю дані", "success");
     }
   }
   //Збираємо дані зі сторінки в массив
