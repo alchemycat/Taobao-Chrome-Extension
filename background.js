@@ -23,10 +23,8 @@ chrome.runtime.onMessage.addListener(async (response, sender, sendResponse) => {
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
     //Обираємо цю таблицю
     const item = spreadsheetList[itemIndex];
-    console.log(`Table: ${JSON.stringify(item)}`);
     //Достаємо з неї дані про webhook та посилання на саму таблицю
     const { spreadsheetLink, webhookLink } = item;
-    console.log(response);
     //Робимо запит по даним які дістали
     fetch(webhookLink, {
       method: "POST",

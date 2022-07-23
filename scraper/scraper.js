@@ -33,7 +33,6 @@ async function scraper() {
         return;
       }
       chrome.storage.local.set({ [tabId]: { data: [], status: true } });
-      createAlert("Починаю парсинг даних", "success");
       scrapeData(shopId, tabId, category);
     }
   });
@@ -59,7 +58,6 @@ async function scraper() {
     } catch (err) {
       const lastData = await getStorageData(tabId);
       //Відправляємо дані до background
-      // console.log(`Data for save: ${JSON.stringify(lastData.data)}`);
       chrome.runtime.sendMessage({
         type: "SAVE_DATA",
         json: lastData.data,
@@ -67,8 +65,8 @@ async function scraper() {
         script: "scrape",
         shopId: shopId,
       });
+
       chrome.storage.local.remove(tabId.toString());
-      createAlert("Зберігаю дані", "success");
     }
   }
   //Збираємо дані зі сторінки в массив
