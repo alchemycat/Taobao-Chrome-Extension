@@ -18,7 +18,6 @@ chrome.runtime.onMessage.addListener(async (response, sender, sendResponse) => {
   if (response.type == "SAVE_DATA") {
     //Достаємо всі таблиці які додані із chrome.storage
     const spreadsheetList = await getStorageData(response.list);
-    console.log(`Spreadsheet config: ${spreadsheetList}`);
     //Далі шукаємо індекс таблиці яка має selected = true що означає вона зараз використовується за замовченням
     const itemIndex = spreadsheetList.findIndex((elem) => elem.selected);
     //Обираємо цю таблицю
