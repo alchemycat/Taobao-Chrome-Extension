@@ -42,7 +42,7 @@ async function scraper() {
         return;
       }
       chrome.storage.local.set({ [tabId]: { data: [], status: true } });
-
+      createAlert("Починаю парсинг даних", "success");
       scrapeData(shopId, tabId, category);
     }
   });
@@ -71,13 +71,18 @@ async function scraper() {
       console.log(err);
       const lastData = await getStorageData(tabId);
       //Відправляємо дані до background
-      chrome.runtime.sendMessage({
-        type: "SAVE_DATA",
-        json: lastData.data,
-        list: "scrapeList",
-        shopId: shopId,
-        script: "scrape",
-      });
+      chrome.runtime.sendMessage(
+        {
+          type: "SAVE_DATA",
+          json: lastData.data,
+          list: "scrapeList",
+          shopId: shopId,
+          script: "scrape",
+        },
+        (response) => {
+          createAlert(response.text, response.status);
+        }
+      );
       console.log(`tabid before remove: ${tabId}`);
       chrome.storage.local.remove(tabId.toString());
       alert("end scraping");

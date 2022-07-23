@@ -43,16 +43,10 @@ chrome.runtime.onMessage.addListener(async (response, sender, sendResponse) => {
       console.log(response);
       if (response.status === 200) {
         //Якщо статус код запиту 200 то відправляємо меседж до content.js що все ок і дані збережені
-
-        chrome.tabs.sendMessage(sender.tab.id, {
-          type: "DELIVERY",
-          message: "Дані збережено успішно",
-          status: "success",
-        });
+        sendResponse({ message: "Дані збережено успішно", status: "success" });
       } else {
         //Якщо статус код запиту не 200 то відправляємо меседж до content.js що дані не збережено
-        chrome.tabs.sendMessage(sender.tab.id, {
-          type: "DELIVERY",
+        sendResponse({
           message: "Дані не збережено. Перевірте таблицю та вебхук",
           status: "failure",
         });

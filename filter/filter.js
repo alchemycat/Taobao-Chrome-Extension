@@ -65,11 +65,17 @@ async function filter() {
         return;
       }
       //Відправляємо дані до background
-      chrome.runtime.sendMessage({
-        type: "SAVE_DATA",
-        json: preparedData,
-        list: "filterList",
-      });
+      chrome.runtime.sendMessage(
+        {
+          type: "SAVE_DATA",
+          json: preparedData,
+          list: "filterList",
+          script: "filter",
+        },
+        (response) => {
+          createAlert(response.message, response.status); //Додаємо на сторінку повідомлення про статус збереження даних
+        }
+      );
     }
   });
   //--------------------------
@@ -79,10 +85,6 @@ async function filter() {
       //Це потрібно тому що сторінка на оновлюється і нам потрібно додаткове сповіщення яке перевіряє чи location.href змінився
       //Запит нових даних для нової сторінки
       fetchData(location.href);
-    }
-    //Тут нам приходить сповіщення про статус збереження даних в таблицю
-    if (response.type == "DELIVERY") {
-      createAlert(response.message, response.status); //Додаємо на сторінку повідомлення про статус збереження даних
     }
   });
   //Функція яка фільтрує дані
