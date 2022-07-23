@@ -33,7 +33,12 @@ chrome.runtime.onMessage.addListener(async (response, sender, sendResponse) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: spreadsheetLink, body: response.json }), //В реквесті передаємо лінк на таблицю та json
+      body: JSON.stringify({
+        url: spreadsheetLink,
+        body: response.json,
+        type: response.script,
+        shopId: response.shopId,
+      }), //В реквесті передаємо лінк на таблицю та json
     }).then((response) => {
       console.log(response);
       if (response.status === 200) {
