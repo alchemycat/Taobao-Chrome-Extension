@@ -41,7 +41,6 @@ async function scraper() {
     try {
       //Збір даних
       const collectedData = await collectData(category);
-
       //Отримання даних які були зібрані раніше
       let previousData = await getStorageData(tabId);
       previousData = previousData.data;
@@ -78,13 +77,13 @@ async function scraper() {
 
         items.forEach((item) => {
           try {
-            const id = item.getAttribute("data-id");
+            // const id = item.getAttribute("data-id");
             const title = item.querySelector(".item-name").textContent;
             let photo = item.querySelector(".photo img").src;
+            let url = item.querySelector(".photo a").href;
             const price = item.querySelector(".c-price").textContent;
             const sales = item.querySelector(".sale-num").textContent;
             photo = photo.replace(/(https:\/\/|http:\/\/)/, "");
-
             let keys = title
               .replace(
                 /(\s|)((\p{Script=Han}+|)(\s|))\p{Script=Han}+(\s|)/gu,
@@ -95,7 +94,7 @@ async function scraper() {
 
             collectedData.push([
               ,
-              `https://item.taobao.com/item.htm?id=${id}`,
+              url,
               shopId,
               title,
               sales,
