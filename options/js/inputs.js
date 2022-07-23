@@ -20,10 +20,9 @@ async function inputs(
   if (minimalRating) {
     inputRating.value = minimalRating;
   }
-
   //Встановлюємо таймаут
   if (timeout) {
-    timeoutInput.value = timeout;
+    timeoutInput.value = timeout / 1000;
   }
 
   //активуємо textarea або додаємо disabled
@@ -49,11 +48,11 @@ async function inputs(
 
   //слідкуємо за подією input для таймауту
   timeoutInput.addEventListener("input", () => {
-    if (/\D/.text(timeoutInput.value)) {
+    if (/\D/.test(timeoutInput.value)) {
       timeoutInput.value = timeoutInput.value.replace(/\D/, "");
     }
-
-    chrome.storage.local.set({ timeout: timeoutInput.value });
+    let tm = parseInt(timeoutInput.value) * 1000;
+    chrome.storage.local.set({ timeout: tm });
   });
 
   //слідкуємо за активністю checkbox

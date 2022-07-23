@@ -23,7 +23,7 @@
         "scraper/helpers/sleep.js"
       ],
       "all_frames": true,
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "background": {
