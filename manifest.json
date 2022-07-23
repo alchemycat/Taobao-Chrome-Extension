@@ -17,7 +17,8 @@
         "filter/helpers/createAlert.js",
         "filter/helpers/getStorageData.js",
         "helpers/addCSS.js",
-        "scraper/scraper.js"
+        "scraper/scraper.js",
+        "helpers/showModal.js"
       ],
       "all_frames": true,
       "run_at": "document_start"

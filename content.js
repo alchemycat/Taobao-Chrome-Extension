@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           chrome.storage.local.remove(tabId.toString());
+          showModal();
         }
       } catch (err) {
         console.log(err);
