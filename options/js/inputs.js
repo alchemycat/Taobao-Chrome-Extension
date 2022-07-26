@@ -2,19 +2,22 @@ async function inputs(
   inputRatingSelector,
   timeoutSelector,
   whitelistSelector,
-  whitelistCheckboxSelector
+  whitelistCheckboxSelector,
+  popularCheckboxSelector
 ) {
   //Пошук елементів
   const inputRating = document.querySelector(inputRatingSelector),
     timeoutInput = document.querySelector(timeoutSelector),
     whitelist = document.querySelector(whitelistSelector),
-    whitelistCheckbox = document.querySelector(whitelistCheckboxSelector);
+    whitelistCheckbox = document.querySelector(whitelistCheckboxSelector),
+    popularCheckbox = document.querySelector(popularCheckboxSelector);
 
   //забираємо дані зі storage
   let minimalRating = await getStorageData("minimalRating");
   let whitelistValue = await getStorageData("whitelist");
-  let isChecked = await getStorageData("whitelistChecked");
   let timeout = await getStorageData("timeout");
+  let isWhitelistChecked = await getStorageData("whitelistChecked");
+  let isPopularChecked = await getStorageData("popularChecked");
 
   //Встановлюємо мінімальний рейтинг
   if (minimalRating) {
@@ -26,10 +29,15 @@ async function inputs(
   }
 
   //активуємо textarea або додаємо disabled
-  if (isChecked) {
-    whitelistCheckbox.checked = isChecked;
+  if (isWhitelistChecked) {
+    whitelistCheckbox.checked = isWhitelistChecked;
   } else {
     whitelist.setAttribute("disabled", true);
+  }
+
+  //стан для чекбокса зберігати популярні
+  if (isPopularChecked) {
+    popularCheckbox.checked = isPopularChecked;
   }
 
   //додаємо значення для вайтліста
@@ -65,6 +73,10 @@ async function inputs(
     }
     //додаємо отримані дані у storage
     chrome.storage.local.set({ whitelistChecked: whitelistCheckbox.checked });
+  });
+
+  popularCheckbox.addEventListener("change", () => {
+    chrome.storage.local.set({ popularChecked: popularCheckbox.checked });
   });
 
   whitelist.addEventListener("input", () => {

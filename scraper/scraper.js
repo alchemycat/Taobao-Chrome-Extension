@@ -6,11 +6,14 @@ async function scraper() {
   let timeout = await getStorageData("timeout");
   timeout = parseInt(timeout);
 
+  //зберігаємо значення чекбокса "зберігати популярні"
+  const isPopularChecked = await getStorageData("popularChecked");
+
   //зберігаємо shopId
   const shopId = document.querySelector("div[shopId]").getAttribute("shopId");
 
   let tabId = await (() => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       chrome.runtime.sendMessage({ type: "GET_TAB_ID" }, (response) => {
         if (response) {
           return resolve(response);
@@ -55,6 +58,17 @@ async function scraper() {
         [tabId]: { data: mergedData, status: true },
       });
 
+      if (isPopularChecked) {
+        //отримуємо кількість продаж останього айтема
+        const lastItemSales = mergedData[mergedData.length - 1][4];
+        console.log(`Last item sales: ${lastItemSales}`);
+        if (!lastItemSales) {
+          throw new Error(
+            "Зберігаю сторінку так як у останнього айтема 0 продаж"
+          );
+        }
+      }
+
       //Наступна сторінка
       await nextPage();
     } catch (err) {
@@ -81,13 +95,25 @@ async function scraper() {
 
         items.forEach((item) => {
           try {
-            let title = item.querySelector(".item-name").textContent;
-            title = title.trim();
+            let title = item.querySelector(".item-name").textContent.trim();
+
             let photo = item.querySelector(".photo img").src;
-            let url = item.querySelector(".photo a").href;
+
+            // let userId = photo.match(/(?<=\/)\d+?(?=\/)/)[0];
+
+            let url = item
+              .querySelector(".photo a")
+              .href.split("&")
+              .filter((item) => /(id=|\?)/.test(item))
+              .join("");
+
+            console.log(`url: ${url}`);
+
             const price = item.querySelector(".c-price").textContent;
             const sales = item.querySelector(".sale-num").textContent;
+
             photo = photo.replace(/(https:\/\/|http:\/\/)/, "");
+
             let keys = title
               .replace(
                 /(\s|)((\p{Script=Han}+|)(\s|))\p{Script=Han}+(\s|)/gu,

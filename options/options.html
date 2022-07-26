@@ -28,7 +28,7 @@
                 role="tab"
                 aria-selected="true"
               >
-                Критерії фільтрації
+                Основні налаштування
               </button>
               <button
                 class="nav-link"
@@ -49,11 +49,11 @@
                 aria-labelledby="v-pills-home-tab"
                 tabindex="0"
               >
-                <h2 class="settings__header">Критерії фільтрації</h2>
+                <h2 class="settings__header">Основні налаштування</h2>
                 <hr />
-                <div class="row">
+                <div class="row mb-3">
                   <div class="col">
-                    <div class="mb-3">
+                    <div>
                       <label for="mrg" class="form-label"
                         >Мінімальний рейтинг</label
                       >
@@ -66,9 +66,9 @@
                     </div>
                   </div>
                   <div class="col">
-                    <div class="mb-3">
+                    <div>
                       <label for="timeout" class="form-label"
-                        >Таймаут (Секунди)</label
+                        >Таймаут для парсингу (Секунди)</label
                       >
                       <input
                         type="text"
@@ -79,18 +79,31 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="wl">
-                  <div class="mb-3 form-check">
-                    <input
-                      type="checkbox"
-                      class="form-check-input"
-                      id="whitelistCheckbox"
-                    />
-                    <label class="form-check-label" for="whitelistCheckbox"
-                      >Включити Вайтліст</label
-                    >
+                <div class="row mb-3">
+                  <div class="col">
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="whitelistCheckbox"
+                      />
+                      <label class="form-check-label" for="whitelistCheckbox"
+                        >Включити Вайтліст</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="popularCheckbox"
+                      />
+                      <label class="form-check-label" for="popularCheckbox"
+                        >Зберегти лише популярні</label
+                      >
+                    </div>
                   </div>
+                </div>
+                <div class="row">
                   <div class="input-group mb-3">
                     <textarea
                       class="form-control"
@@ -101,6 +114,9 @@
                     ></textarea>
                   </div>
                 </div>
+                <!-- <div class="wl"> -->
+
+                <!-- </div> -->
               </div>
               <div
                 class="tab-pane fade"
