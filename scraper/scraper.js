@@ -57,11 +57,9 @@ async function scraper() {
       chrome.storage.local.set({
         [tabId]: { data: mergedData, status: true },
       });
-
       if (isPopularChecked) {
         //отримуємо кількість продаж останього айтема
         const lastItemSales = mergedData[mergedData.length - 1][4];
-        console.log(`Last item sales: ${lastItemSales}`);
         if (!lastItemSales) {
           throw new Error(
             "Зберігаю сторінку так як у останнього айтема 0 продаж"
@@ -99,15 +97,15 @@ async function scraper() {
 
             let photo = item.querySelector(".photo img").src;
 
+            //userid парсимо з юрл фото
             // let userId = photo.match(/(?<=\/)\d+?(?=\/)/)[0];
 
+            //додаємо юрл на айтем та одразу очищаємо його від міток, залишаємо тільки id
             let url = item
               .querySelector(".photo a")
               .href.split("&")
               .filter((item) => /(id=|\?)/.test(item))
               .join("");
-
-            console.log(`url: ${url}`);
 
             const price = item.querySelector(".c-price").textContent;
             const sales = item.querySelector(".sale-num").textContent;

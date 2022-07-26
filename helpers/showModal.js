@@ -33,13 +33,24 @@ function showModal() {
 
   button.addEventListener("click", (e) => {
     e.stopPropagation();
-    modalContainer.remove();
-    body.style.overflow = "inherit";
+    removeModal();
   });
 
   close.addEventListener("click", (e) => {
     e.stopPropagation();
+    removeModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key == "Enter" || e.key == "Escape") {
+      removeModal();
+    }
+  });
+
+  function removeModal() {
     modalContainer.remove();
     body.style.overflow = "inherit";
-  });
+  }
 }
